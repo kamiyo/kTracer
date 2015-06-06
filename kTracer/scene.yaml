@@ -1,0 +1,68 @@
+%YAML 1.2
+--- #setup scene
+options:
+    antialias:
+        type: nrooks
+        n: 3
+    shadows:
+        on: true
+        soft: true
+        shape: circle
+    recursionDepth: 4
+    refractionDepth: 4
+    depthOfField:
+        on: true
+        shape: circle
+    structure: bvh
+    order: hilbert
+--- #setup camera
+camera:
+    eye:    {x: 0.0, y: 0.0, z: 0.0}
+    dir:    {x: 0.0, y: 0.0, z: 0.3}
+    up:     {x: 0.0, y: 1.0, z: 0.0}
+    image:  {w: 6.0, h: 4.5}
+    pixels: {w: 400.0, h: 300.0}
+    f-stop: 100
+--- #setup materials
+- material: &red
+    diffuse: {r: 0.8, g: 0.2, b: 0.2}
+- material: &blue
+    diffuse: {r: 0.2, g: 0.2, b: 0.8}
+- material: &grey
+    diffuse: {r: 0.4, g: 0.4, b: 0.4}
+- material: &glass
+    specular: {r: 0.5, g: 0.5, b: 0.5}
+    attenuation: {r: 0.01, g: 0.01, b: 0.01}
+    index: 1.3
+    power: 128
+--- #setup lights
+- light: &l0
+    position: {x: 0.0, y: 4.7, z: 0.0}
+    intensity: {r: 100, g: 100, b: 100}
+    size: 0.05
+    attenuation: {squared: 0.0, linear: 0.0, constant: 1.0}
+--- #scene
+- plane:
+    position: {x: -5.0, y: 0.0, z: 0.0}
+    normal:   {x: 1.0,  y: 0.0, z: 0.0}
+    material: *red
+ - plane:
+    position: {x: 5.0,  y: 0.0, z: 0.0}
+    normal:   {x: -1.0, y: 0.0, z: 0.0}
+    material: *blue
+- plane:
+    position: {x: 0.0, y: -5.0, z: 0.0}
+    normal:   {x: 0.0, y: 1.0,  z: 0.0}
+    material: *grey
+- plane:
+    position: {x: 0.0, y: 5.0,  z: 0.0}
+    normal:   {x: 0.0, y: -1.0, z: 0.0}
+    material: *grey
+- plane:
+    position: {x: 0.0, y: 0.0, z: -5.0}
+    normal:   {x: 0.0, y: 0.0, z: 1.0}
+    material: *grey
+- plane:
+    position: {x: 0.0, y: 0.0, z: 10.0}
+    normal:   {x: 0.0, y: 0.0, z: -1.0}
+    material: *grey
