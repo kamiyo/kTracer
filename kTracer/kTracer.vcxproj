@@ -119,10 +119,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BlinnPhong.h" />
     <ClInclude Include="HitRecord.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="parse.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="RayBase.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Surface.h" />
@@ -130,9 +133,10 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BlinnPhong.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
     <ClCompile Include="parse.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Surface.cpp" />
   </ItemGroup>
