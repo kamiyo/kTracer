@@ -1,14 +1,16 @@
 #pragma once
 
 #include "typedefs.h"
+#include "HitRecord.h"
+#include "RayBase.h"
 
 class Surface
 {
 public:
 	Surface();
 	~Surface();
-	virtual bool preHit(RayBase& ray, double t0, double t1, hitRecord& record) const;
-	virtual bool hit(RayBase& ray, double t0, double t1, hitRecord& record) const = 0;
+	virtual bool preHit(RayBase& ray, double t0, double t1, HitRecord& record) const;
+	virtual bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const = 0;
 	/*void setTransform(Matrix4d& m) {
 		m_isTransformed = true;
 		m_inverse = m.inverse();

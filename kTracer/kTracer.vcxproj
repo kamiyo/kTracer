@@ -119,7 +119,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="HitRecord.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="RayBase.h" />
     <ClInclude Include="Scene.h" />
@@ -129,8 +131,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="parse.cpp" />
-    <ClCompile Include="RayBase.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Surface.cpp" />
   </ItemGroup>

@@ -12,6 +12,7 @@
 #define INF std::numeric_limits<double>::infinity()
 #define nINF -1 * std::numeric_limits<double>::infinity()
 #define EULER 2.718281828459045235360287471352
+#define EPSILON 0.0001
 
 typedef Eigen::Vector2d Vector2d;
 typedef Eigen::Vector2i Vector2i;
