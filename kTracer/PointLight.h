@@ -20,6 +20,14 @@ public:
 		return 1 / m_attenuation.dot(Vector3d(1.0, norm, norm * norm));
 	}
 
+	Vector3d getVector(Vector3d point) const {
+		return (m_position - point);
+	}
+
+	RGB i() const {
+		return m_intensity;
+	}
+
 private:
 	Vector3d m_position;
 	double m_radius;
