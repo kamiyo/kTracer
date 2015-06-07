@@ -124,7 +124,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Material.h" />
-    <ClInclude Include="parse.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RayBase.h" />
     <ClInclude Include="Scene.h" />
@@ -135,7 +135,7 @@
   <ItemGroup>
     <ClCompile Include="BlinnPhong.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="parse.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Surface.cpp" />

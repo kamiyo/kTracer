@@ -2,10 +2,10 @@
 
 #include <yaml-cpp/yaml.h>
 
-class Parse
+class Parser
 {
 public:
-	Parse();
-	~Parse();
+	Parser();
+	~Parser();
 };
 

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Light.h"
+#include "Surface.h"
+#include "parse.h"
+
 class Scene
 {
 public:
@@ -8,8 +12,8 @@ public:
 
 private:
 	Options* m_options;
-	Surface* m_surfaces;
-	Lights* m_lights;
-	Materials* m_materials;
+	std::vector<Surface*> m_surfaces;
+	std::vector<Light*> m_lights;
+	std::vector<Material*> m_materials;
 };
 

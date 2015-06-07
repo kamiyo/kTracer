@@ -12,6 +12,7 @@ public:
 	{
 		m_intensity = intensity;
 		m_attenuation = atten;
+		m_type = POINT;
 	}
 	~PointLight() {}
 
@@ -20,13 +21,9 @@ public:
 		return 1 / m_attenuation.dot(Vector3d(1.0, norm, norm * norm));
 	}
 
-	Vector3d getVector(Vector3d point) const {
-		return (m_position - point);
-	}
-
-	RGB i() const {
-		return m_intensity;
-	}
+	Vector3d getVector(Vector3d point) const { return (m_position - point);	}
+	RGB i() const {	return m_intensity;	}
+	int type() const { return m_type; }
 
 private:
 	Vector3d m_position;

@@ -9,6 +9,7 @@ class Material
 public:
 	Material() {}
 	~Material() {}
-	virtual RGB brdf(const Vector3d& view, const Light& light, const Vector3d& normal) = 0;
+	virtual RGB brdf(const Vector3d& view, const Vector3d& light, const Vector3d& normal, const RGB& intensity) const = 0;
+
 };
 
