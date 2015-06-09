@@ -9,9 +9,9 @@ class Parser
 {
 public:
 	Parser(const std::string filename);
-	void 
-	~Parser();
+	void loadOptions(Options* o) const;
+	~Parser() {}
 
 private:
-	std::vector<YAML::Node> m_scene;
+	YAML::Node m_scene;
 };
