@@ -2,7 +2,7 @@
 
 #include "Light.h"
 #include "Surface.h"
-#include "parse.h"
+#include "Parser.h"
 
 class Scene
 {
@@ -11,7 +11,7 @@ public:
 	~Scene();
 
 private:
-	Options* m_options;
+	//Options* m_options;
 	std::vector<Surface*> m_surfaces;
 	std::vector<Light*> m_lights;
 	std::vector<Material*> m_materials;
