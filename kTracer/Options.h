@@ -12,10 +12,22 @@ public:
 
 	void AAtype(std::string type, int n) {
 		m_antialias = enums[type];
-
+	}
+	void shadow(std::string type, std::string shape) {
+		m_shadow_type = enums[type];
+		m_light_shape = enums[shape];
+	}
+	void dof(std::string type) {
+		m_dof = enums[type];
+	}
+	void structure(std::string type) {
+		m_scene_structure = enums[type];
+	}
+	void renderOrder(std::string type) {
+		m_render_order = enums[type];
 	}
 
-	std::map<std::string, int> enums = {
+	std::map<std::string, int> enums = std::map<std::string, int>{
 		{ "off", 0 },
 		{ "center", 1 }, { "random", 2 }, { "jittered", 3 }, { "nrooks", 4 }, { "nrooks_correlated", 5 }, { "adaptive", 6 },
 		{ "hard", 1 }, { "soft", 2 },
