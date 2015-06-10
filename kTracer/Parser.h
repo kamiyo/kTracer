@@ -10,6 +10,7 @@ class Parser
 public:
 	Parser(const std::string filename);
 	void loadOptions(Options* o) const;
+	void loadCamera(Camera* c) const;
 	~Parser() {}
 
 private:

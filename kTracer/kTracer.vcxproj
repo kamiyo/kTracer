@@ -120,6 +120,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BlinnPhong.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="HitRecord.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="main.h" />
@@ -136,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BlinnPhong.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="Parser.cpp" />

@@ -30,3 +30,4 @@ void Parser::loadOptions(Options* o) const {
 	}
 }
 
+void
