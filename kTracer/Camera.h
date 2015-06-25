@@ -17,7 +17,7 @@ public:
 		m_focal_distance = (focal == nINF) ? m_dir.norm() : focal;
 		m_lens_radius = (fstop == nINF) ? 0.0 : m_focal_distance / fstop;
 	}
-	~Camera();
+	~Camera() {}
 
 private:
 	Vector3d m_eye, m_dir;

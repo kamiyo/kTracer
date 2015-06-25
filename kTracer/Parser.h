@@ -2,7 +2,6 @@
 
 #include <yaml-cpp/yaml.h>
 #include "Options.h"
-#include "Material.h"
 #include "Objects.h"
 
 class Parser

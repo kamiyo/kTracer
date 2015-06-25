@@ -30,4 +30,30 @@ void Parser::loadOptions(Options* o) const {
 	}
 }
 
-void
+void Parser::loadCamera(Camera* c) const {
+	try {
+		YAML::Node camera = m_scene["camera"];
+		YAML::Node eye = camera["eye"];
+		Vector3d eyeVec(eye["x"].as<double>(), eye["y"].as<double>(), eye["z"].as<double>());
+		YAML::Node dir = camera["dir"];
+		Vector3d dirVec(dir["x"].as<double>(), dir["y"].as<double>(), dir["z"].as<double>());
+		YAML::Node up = camera["up"];
+		Vector3d upVec(up["x"].as<double>(), up["y"].as<double>(), up["z"].as<double>());
+
+		YAML::Node image = camera["image"];
+		double w = image["w"].as<double>();
+		double h = image["h"].as<double>();
+		
+		YAML::Node pixels = camera["pixels"];
+		int nx = pixels["w"].as<int>();
+		int ny = pixels["h"].as<int>();
+
+		double fstop = (camera["f-stop"]) ? camera["f-stop"].as<double>() : nINF;
+		double focal = (camera["focal"]) ? camera["focal"].as<double>() : nINF;
+		c = new Camera(eyeVec, dirVec, upVec, w, h, nx, ny, focal, fstop);
+
+	}
+	catch (std::exception e) {
+		std::cerr << e.what() << std::endl;
+	}
+}
