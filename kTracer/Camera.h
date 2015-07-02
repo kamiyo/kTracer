@@ -1,5 +1,6 @@
 #pragma once
 #include "typedefs.h"
+#include "Ray.h"
 
 class Camera
 {
@@ -8,23 +9,27 @@ public:
 		double width, double height, int pixelw, int pixelh, double focal, double fstop)
 		: m_eye(eye)
 		, m_dir(dir.normalized())
-		, m_width(width), m_height(height)
-		, m_pixel_width(pixelw), m_pixel_height(pixelh)
+		, m_dim(Vector2d(width, height))
+		, m_pixel_dim(Vector2i(pixelw, pixelh))
 	{
-		m_w = -m_dir;
-		m_u = (up.cross(m_w)).normalized();
-		m_v = (m_w.cross(m_u)).normalized();
+		Vector3d w = -m_dir.normalized();
+		Vector3d u = (up.cross(w)).normalized();
+		Vector3d v = (w.cross(u)).normalized();
+		m_uvw << u, v, w;
 		m_focal_distance = (focal == nINF) ? m_dir.norm() : focal;
 		m_lens_radius = (fstop == nINF) ? 0.0 : m_focal_distance / fstop;
 	}
 	~Camera() {}
 
+	Ray generateRay(const double x, const double y) const;
+
 private:
 	Vector3d m_eye, m_dir;
-	Vector3d m_u, m_v, m_w;
+	//Vector3d m_u, m_v, m_w;
+	Matrix3d m_uvw;
 	//Vector3d m_focal_plane_pos, m_focal_plane_dir;
-	double m_width, m_height;
-	int m_pixel_width, m_pixel_height;
+	Vector2d m_dim;
+	Vector2i m_pixel_dim;
 	double m_focal_distance;
 	double m_lens_radius;
 };

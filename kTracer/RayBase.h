@@ -5,7 +5,6 @@
 class RayBase
 {
 public:
-	RayBase() {}
 	~RayBase() {}
 	RayBase(Vector3d eye, Vector3d dir, int type)
 	: m_eye(eye)

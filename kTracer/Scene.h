@@ -7,11 +7,16 @@
 class Scene
 {
 public:
-	Scene();
-	~Scene();
+	Scene(const std::string filename) {
+		Parser p(filename);
+		p.loadOptions(m_options);
+		p.loadCamera(m_camera);
+	}
+	~Scene() {}
 
 private:
-	//Options* m_options;
+	Options* m_options;
+	Camera* m_camera;
 	std::vector<Surface*> m_surfaces;
 	std::vector<Light*> m_lights;
 	std::vector<Material*> m_materials;

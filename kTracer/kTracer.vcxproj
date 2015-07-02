@@ -129,6 +129,7 @@
     <ClInclude Include="Options.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="RayBase.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Surface.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Surface.cpp" />
   </ItemGroup>
