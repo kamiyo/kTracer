@@ -10,7 +10,8 @@ public:
 	Parser(const std::string filename);
 	void loadOptions(Options* o) const;
 	void loadCamera(Camera* c) const;
-	void loadMaterials(std::vector<Material *>& m) const;
+	void loadLights(std::vector<Light*>& lightVec) const;
+	void loadMaterials(std::vector<Material*>& matVec) const;
 	~Parser() {}
 
 private:

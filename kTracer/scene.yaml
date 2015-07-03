@@ -26,18 +26,26 @@ materials:
 #setup materials
     - material: &red
         name: red
+        type: blinn-phong
         diffuse: {r: 0.8, g: 0.2, b: 0.2}
 
     - material: &blue
         name: blue
+        type: reflective
         diffuse: {r: 0.2, g: 0.2, b: 0.8}
+        specular: {r: 0.2, g: 0.2, b: 0.8}
+        power: 128
 
     - material: &grey
         name: grey
+        type: blinn-phong
         diffuse: {r: 0.4, g: 0.4, b: 0.4}
+        specular: {r: 0.2, g: 0.2, b: 0.2}
+        power: 64
 
     - material: &glass
         name: glass
+        type: refractive
         specular: {r: 0.5, g: 0.5, b: 0.5}
         attenuation: {r: 0.01, g: 0.01, b: 0.01}
         index: 1.3

@@ -67,7 +67,37 @@ void Parser::loadCamera(Camera* c) const {
 	}
 }
 
-void Parser::loadMaterials(std::vector<Material *>& m) const {
+void Parser::loadLights(std::vector<Light*>& lightVec) const {
+	try {
+		YAML::Node lights = m_scene["lights"];
+		for (YAML::Node l : lights) {
+			double size = (l["size"]) ? l["size"].as<double>() : 0.0;
+			Vector3d attenuation(1.0, 0.0, 0.0);
+			YAML::Node i = l["intensity"];
+			RGB intensity = RGB(i["r"].as<double>(), i["g"].as<double>(), i["b"].as<double>());
+			std::string type = l["type"].as<std::string>();
+
+			if (type == "point") {
+				YAML::Node p = l["position"];
+				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>());
+				lightVec.push_back(new PointLight(position, intensity, attenuation, size));
+				continue;
+			}
+			if (type == "directional") {
+				YAML::Node d = l["direction"];
+				Vector3d direction = Vector3d(d["x"].as<double>(), d["y"].as<double>(), d["z"].as<double>());
+				lightVec.push_back(new DirectionalLight(direction, intensity, size));
+				continue;
+			}
+		}
+
+	}
+	catch (std::exception e) {
+		std::cerr << e.what() << std::endl;
+	}
+}
+
+void Parser::loadMaterials(std::vector<Material *>& matVec) const {
 	try {
 		YAML::Node materials = m_scene["materials"];
 		for (YAML::Node m : materials) {
@@ -79,10 +109,34 @@ void Parser::loadMaterials(std::vector<Material *>& m) const {
 				YAML::Node d = m["diffuse"];
 				diffuse = RGB(d["r"].as<double>(), d["g"].as<double>(), d["b"].as<double>());
 			}
+			if (m["specular"]) {
+				YAML::Node s = m["specular"];
+				specular = RGB(s["r"].as<double>(), s["g"].as<double>(), s["b"].as<double>());
+			}
+			if (m["attenuation"]) {
+				YAML::Node a = m["attenuation"];
+				attenuation = RGB(a["r"].as<double>(), a["g"].as<double>(), a["b"].as<double>());
+			}
+			double index = (m["index"]) ? m["index"].as<double>() : 1.0;
+			unsigned int power = (m["power"]) ? m["power"].as<unsigned int>() : 1u;
+			bool normalized = (m["normalized"]) ? m["normalized"].as<bool>() : false;
+			std::string type = m["type"].as<std::string>();
+			if (type == "blinn-phong") {
+				matVec.push_back(new BlinnPhong(name, diffuse, specular, power, normalized));
+				continue;
+			}
+			if (type == "refractive") {
+				continue;
+				//matVec.push_back(new Refractive)
+			}
+			if (type == "reflective") {
+				// reflective
+				continue;
+			}
 		}
-
-
-
+	}
+	catch (std::exception e) {
+		std::cerr << e.what() << std::endl;
 	}
 }
 

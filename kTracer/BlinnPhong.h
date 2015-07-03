@@ -7,11 +7,12 @@ class BlinnPhong :
 	public Material
 {
 public:
-	BlinnPhong(RGB diffuse, RGB specular, double power, bool normalized = false)
+	BlinnPhong(std::string name, RGB diffuse, RGB specular, double power, bool normalized = false)
 		: m_diffuse(diffuse)
 		, m_specular(specular)
 		, m_power(power)
 	{
+		m_name = name;
 		if (normalized) calcNormalizationConst();
 	}
 	

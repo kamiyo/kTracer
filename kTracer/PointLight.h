@@ -16,14 +16,12 @@ public:
 	}
 	~PointLight() {}
 
-	double getFallOff(Vector3d point) const {
+	double getFalloff(Vector3d point) const {
 		double norm = (point - m_position).norm();
 		return 1 / m_attenuation.dot(Vector3d(1.0, norm, norm * norm));
 	}
 
 	Vector3d getVector(Vector3d point) const { return (m_position - point);	}
-	RGB i() const {	return m_intensity;	}
-	int type() const { return m_type; }
 
 private:
 	Vector3d m_position;

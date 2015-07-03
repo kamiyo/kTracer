@@ -1,5 +1,7 @@
 #pragma once
 
 // put all objects here
-#include "Material.h"
+#include "BlinnPhong.h"
 #include "Camera.h"
+#include "PointLight.h"
+#include "DirectionalLight.h"
