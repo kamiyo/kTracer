@@ -9,7 +9,8 @@ bool Plane::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
 	double t = numerator / denominator;
 	if (t < t0 || t > t1) { return false; }
 
-	if (ray.type == RayBase::SHADOW) return true;
+	record.t = t;
+	if (ray.type == RayBase::SHADOW) { return true; }
 	
 	record.normal = m_normal;
 	record.material = m_material;
