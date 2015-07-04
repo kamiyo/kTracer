@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stack>
 
 Parser::Parser(const std::string filename) {
 	try {
@@ -99,7 +100,7 @@ void Parser::loadLights(std::vector<Light*>& lightVec) const {
 	}
 }
 
-void Parser::loadMaterials(std::vector<Material *>& matVec) const {
+void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) const {
 	try {
 		YAML::Node materials = m_scene["materials"];
 		for (YAML::Node m : materials) {
@@ -125,7 +126,7 @@ void Parser::loadMaterials(std::vector<Material *>& matVec) const {
 			bool normalized = (m["normalized"]) ? m["normalized"].as<bool>() : false;
 			std::string type = m["type"].as<std::string>();
 			if (type == "blinn-phong") {
-				matVec.push_back(new BlinnPhong(name, diffuse, specular, power, normalized));
+				matVec[name] = (new BlinnPhong(name, diffuse, specular, power, normalized));
 				continue;
 			}
 			if (type == "refractive") {
@@ -143,11 +144,15 @@ void Parser::loadMaterials(std::vector<Material *>& matVec) const {
 	}
 }
 
-void Parser::loadScene(std::vector<Surface *>& sVec) const {
+void Parser::loadScene(std::vector<Surface *>& sVec, const std::unordered_map<std::string, Material*>& mVec) const {
 	try {
+		std::stack<Transform3d> transform, inverse;
+
 		YAML::Node scene = m_scene["scene"];
 		for (YAML::Node s : scene) {
+			if (s["type"] = "plane") {
 
+			}
 
 
 

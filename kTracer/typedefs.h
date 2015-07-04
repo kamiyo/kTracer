@@ -29,6 +29,8 @@ typedef Eigen::Array4d Array4d;
 typedef Eigen::Array33d Array33d;
 typedef Eigen::Matrix<Vector2d, Eigen::Dynamic, Eigen::Dynamic> Sampler2d;
 typedef Eigen::Matrix<Vector2i, Eigen::Dynamic, Eigen::Dynamic> Sampler2i;
+typedef Eigen::AffineCompact3d Transform3d;
+typedef Eigen::AffineCompact2d Transform2d;
 
 template <typename Object>
 using u_ptr = std::unique_ptr<Object>;

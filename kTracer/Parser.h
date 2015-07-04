@@ -1,8 +1,9 @@
 #pragma once
 
-#include <yaml-cpp/yaml.h>
 #include "Options.h"
 #include "Objects.h"
+#include <yaml-cpp/yaml.h>
+#include <unordered_map>
 
 class Parser
 {
@@ -11,8 +12,8 @@ public:
 	void loadOptions(Options* o) const;
 	void loadCamera(Camera* c) const;
 	void loadLights(std::vector<Light*>& lightVec) const;
-	void loadMaterials(std::vector<Material*>& matVec) const;
-	void loadScene(std::vector<Surface*>& sVec) const;
+	void loadMaterials(std::unordered_map<std::string, Material*>& matVec) const;
+	void loadScene(std::vector<Surface*>& sVec, const std::unordered_map<std::string, Material*>& matVec) const;
 	~Parser() {}
 
 private:

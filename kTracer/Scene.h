@@ -3,6 +3,7 @@
 #include "Light.h"
 #include "Surface.h"
 #include "Parser.h"
+#include <unordered_map>
 
 class Scene
 {
@@ -26,6 +27,6 @@ private:
 	Camera* m_camera;
 	std::vector<Surface*> m_surfaces;
 	std::vector<Light*> m_lights;
-	std::vector<Material*> m_materials;
+	std::unordered_map<std::string, Material*> m_materials;
 };
 
