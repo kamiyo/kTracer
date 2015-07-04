@@ -12,6 +12,7 @@ public:
 	void loadCamera(Camera* c) const;
 	void loadLights(std::vector<Light*>& lightVec) const;
 	void loadMaterials(std::vector<Material*>& matVec) const;
+	void loadScene(std::vector<Surface*>& sVec) const;
 	~Parser() {}
 
 private:

@@ -5,8 +5,6 @@
 class Light
 {
 public:
-	Light();
-	~Light();
 	virtual Vector3d getVector(Vector3d point) const = 0;
 	virtual double getFalloff(Vector3d point) const = 0;
 	RGB i() const { return m_intensity; }

@@ -14,6 +14,7 @@ Parser::Parser(const std::string filename) {
 
 void Parser::loadOptions(Options* o) const {
 	try {
+		o = new Options();
 		YAML::Node options = m_scene["options"];
 		o->AAtype(options["antialias"]["type"].as<std::string>(),
 			options["antialias"]["n"].as<int>());
@@ -21,12 +22,12 @@ void Parser::loadOptions(Options* o) const {
 			options["shadows"]["shape"].as<std::string>());
 		o->m_recursion_depth = options["recursionDepth"].as<int>();
 		o->m_refraction_depth = options["refractionDepth"].as<int>();
-		o->dof(options["depthOfField"].as<std::string>());
+		o->dof(options["depthOfField"]["type"].as<std::string>());
 		o->structure(options["structure"].as<std::string>());
 		o->renderOrder(options["order"].as<std::string>());
 	}
 	catch (std::exception e) {
-		std::cerr << e.what() << std::endl;
+		std::cerr << "options: " << e.what() << std::endl;
 	}
 }
 
@@ -63,7 +64,7 @@ void Parser::loadCamera(Camera* c) const {
 
 	}
 	catch (std::exception e) {
-		std::cerr << e.what() << std::endl;
+		std::cerr << "camera: " << e.what() << std::endl;
 	}
 }
 
@@ -71,6 +72,7 @@ void Parser::loadLights(std::vector<Light*>& lightVec) const {
 	try {
 		YAML::Node lights = m_scene["lights"];
 		for (YAML::Node l : lights) {
+			//l = l["light"];
 			double size = (l["size"]) ? l["size"].as<double>() : 0.0;
 			Vector3d attenuation(1.0, 0.0, 0.0);
 			YAML::Node i = l["intensity"];
@@ -93,7 +95,7 @@ void Parser::loadLights(std::vector<Light*>& lightVec) const {
 
 	}
 	catch (std::exception e) {
-		std::cerr << e.what() << std::endl;
+		std::cerr << "lights: " << e.what() << std::endl;
 	}
 }
 
@@ -101,6 +103,7 @@ void Parser::loadMaterials(std::vector<Material *>& matVec) const {
 	try {
 		YAML::Node materials = m_scene["materials"];
 		for (YAML::Node m : materials) {
+			//m = m["material"];
 			std::string name = m["name"].as<std::string>();
 			RGB diffuse, specular, attenuation;
 			diffuse = specular = RGB::Zero();
@@ -136,9 +139,21 @@ void Parser::loadMaterials(std::vector<Material *>& matVec) const {
 		}
 	}
 	catch (std::exception e) {
-		std::cerr << e.what() << std::endl;
+		std::cerr << "materials: " << e.what() << std::endl;
 	}
 }
 
+void Parser::loadScene(std::vector<Surface *>& sVec) const {
+	try {
+		YAML::Node scene = m_scene["scene"];
+		for (YAML::Node s : scene) {
 
-//void Parser::loadScene
+
+
+
+		}
+	}
+	catch (std::exception e) {
+		std::cerr << "scene: " << e.what() << std::endl;
+	}
+}

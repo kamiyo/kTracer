@@ -11,8 +11,15 @@ public:
 		Parser p(filename);
 		p.loadOptions(m_options);
 		p.loadCamera(m_camera);
+		p.loadMaterials(m_materials);
+		p.loadLights(m_lights);
 	}
-	~Scene() {}
+	~Scene() {
+		delete m_options;
+		delete m_camera;
+		m_options = nullptr;
+		m_camera = nullptr;
+	}
 
 private:
 	Options* m_options;
