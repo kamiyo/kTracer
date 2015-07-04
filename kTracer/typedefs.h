@@ -6,6 +6,7 @@
 #include <Eigen/Geometry>
 #include <cmath>
 #include <ctime>
+#include <limits>
 
 #define _USE_MATH_DEFINES
 

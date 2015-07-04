@@ -9,6 +9,6 @@ public:
 	~HitRecord();
 	double t;
 	Vector3d normal;
-	s_ptr<Material> m;
+	Material* material;
 };
 

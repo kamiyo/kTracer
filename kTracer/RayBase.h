@@ -26,12 +26,12 @@ public:
 	RayBase& d(Vector3d dir) { m_dir = dir;	init();	return *this; }
 
 	int type() const { return m_type; }
+	static const int VIEW = 0, SHADOW = 1, PHOTON = 2;
 
 protected:
 	Vector3d m_eye, m_dir, m_inv;
 	Vector3i m_sign;
 	double m_epsilon;
 	int m_type;
-	static const int VIEW = 0, SHADOW = 1, PHOTON = 2;
 };
 

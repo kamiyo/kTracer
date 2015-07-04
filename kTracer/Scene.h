@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Light.h"
-#include "Surface.h"
+#include "Objects.h"
 #include "Parser.h"
 #include <unordered_map>
 
@@ -25,7 +24,7 @@ public:
 private:
 	Options* m_options;
 	Camera* m_camera;
-	std::vector<Surface*> m_surfaces;
+	std::vector<Intersectable*> m_intersectables;
 	std::vector<Light*> m_lights;
 	std::unordered_map<std::string, Material*> m_materials;
 };

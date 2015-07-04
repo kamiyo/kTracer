@@ -144,16 +144,36 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 	}
 }
 
-void Parser::loadScene(std::vector<Surface *>& sVec, const std::unordered_map<std::string, Material*>& mVec) const {
+void Parser::loadScene(std::vector<Intersectable*>& sVec, const std::unordered_map<std::string, Material*>& mVec) const {
 	try {
 		std::stack<Transform3d> transform, inverse;
 
 		YAML::Node scene = m_scene["scene"];
 		for (YAML::Node s : scene) {
-			if (s["type"] = "plane") {
-
+			std::string matName = s["material"].as<std::string>();
+			auto m = mVec.find(matName);
+			Material* material;
+			if (m != mVec.end()) {
+				material = m->second;
 			}
+			else {
+				material = nullptr;
+			}
+			if (s["type"] = "plane") {
+				YAML::Node p = s["position"], n = s["normal"];
+				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>()),
+					normal = Vector3d(n["x"].as<double>(), n["y"].as<double>(), n["z"].as<double>());
+				sVec.push_back(new Plane(position, normal, material));
+				continue;
+			}
+			if (s["type"] = "sphere") {
 
+				continue;
+			}
+			if (s["type"] = "triangle") {
+
+				continue;
+			}
 
 
 		}
