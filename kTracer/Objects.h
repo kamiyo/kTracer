@@ -7,5 +7,6 @@
 #include "Surface.h"
 #include "Plane.h"
 #include "Sphere.h"
+#include "Triangle.h"
 #include "PointLight.h"
 #include "DirectionalLight.h"

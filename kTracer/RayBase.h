@@ -21,6 +21,8 @@ public:
 	Vector3d getPoint(double t) const {	return m_eye + t * m_dir; }
 	Vector3d e() const { return m_eye; }
 	Vector3d d() const { return m_dir; }
+	Vector3d i() const { return m_inv; }
+	Vector3i s() const { return m_sign; }
 	
 	RayBase& e(Vector3d eye) { m_eye = eye; return *this; }
 	RayBase& d(Vector3d dir) { m_dir = dir;	init();	return *this; }

@@ -82,6 +82,12 @@ scene:
       normal:   {x: 0.0, y: 0.0, z: -1.0}
       material: grey
 #transforms go here too. Will be parsed
+    - type: triangle
+      vertices:
+      - {x: 0.0,  y: 0.0, z: -5.0}
+      - {x: 1.0,  y: 1.0, z: -4.0}
+      - {x: -1.0, y: 1.0, z: -4.0}
+      material: red
     - type: sphere
       position: {x: -2, y: -2, z: -2}
       radius: 1
