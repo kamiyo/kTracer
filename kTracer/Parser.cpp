@@ -167,7 +167,10 @@ void Parser::loadScene(std::vector<Intersectable*>& sVec, const std::unordered_m
 				continue;
 			}
 			if (s["type"] = "sphere") {
-
+				YAML::Node p = s["position"];
+				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>());
+				double radius = s["radius"].as<double>();
+				sVec.push_back(new Sphere(position, radius, material));
 				continue;
 			}
 			if (s["type"] = "triangle") {

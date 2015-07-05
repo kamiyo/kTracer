@@ -6,7 +6,8 @@ class Plane :
 public:
 	Plane(Vector3d position, Vector3d normal, Material* material)
 	: m_position(position)
-	, m_normal(normal)
+	, m_normal(normal.normalized())
+	, m_NP(m_normal.dot(m_position))
 	{
 		m_material = material;
 		m_normal.normalize();
@@ -18,5 +19,6 @@ public:
 
 private:
 	Vector3d m_position, m_normal;
+	double m_NP;
 };
 
