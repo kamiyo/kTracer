@@ -2,6 +2,7 @@
 
 #include "typedefs.h"
 #include "Intersectable.h"
+#include "AlignedBox.h"
 #include "HitRecord.h"
 #include "RayBase.h"
 
@@ -20,12 +21,10 @@ public:
 	}*/
 
 	enum { PLANE, SPHERE, CYLINDER, CONE, TORUS, TRIANGLE, FACE, CIRCLE, BOX, BOVOH, INSTANCE };
-protected:
 	Material* m_material;
 	//Matrix4d m_inverse;
 	//Matrix4d m_transpose;
-	//BoundingBox m_boundingBox;
+	AlignedBox m_boundingBox;
 	//bool m_isTransformed;
 	int m_type;
 };
-

@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Intersectable.h"
 #include "Surface.h"
+#include "Group.h"
 #include "Plane.h"
 #include "Sphere.h"
 #include "Triangle.h"

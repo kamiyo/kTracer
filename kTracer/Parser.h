@@ -13,7 +13,7 @@ public:
 	void loadCamera(Camera* c) const;
 	void loadLights(std::vector<Light*>& lightVec) const;
 	void loadMaterials(std::unordered_map<std::string, Material*>& matVec) const;
-	void loadScene(std::vector<Intersectable*>& sVec, const std::unordered_map<std::string, Material*>& matVec) const;
+	void loadScene(Group* sVec, const std::unordered_map<std::string, Material*>& matVec) const;
 	~Parser() {}
 
 private:
