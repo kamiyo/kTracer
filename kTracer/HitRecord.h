@@ -5,8 +5,8 @@
 class HitRecord
 {
 public:
-	HitRecord();
-	~HitRecord();
+	HitRecord() {}
+	~HitRecord() {}
 	double t;
 	Vector3d normal;
 	Material* material;

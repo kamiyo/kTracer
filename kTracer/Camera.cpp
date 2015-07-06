@@ -9,5 +9,5 @@ Ray Camera::generateRay(const double x, const double y) const {
 
 	Vector3d dir = point.transpose() * m_uvw;
 
-	return Ray(m_eye, dir);
+	return Ray(m_eye, dir, Ray::VIEW);
 }

@@ -22,6 +22,8 @@ public:
 	~Camera() {}
 
 	Ray generateRay(const double x, const double y) const;
+	
+	Vector2i m_pixel_dim;
 
 private:
 	Vector3d m_eye, m_dir;
@@ -29,7 +31,6 @@ private:
 	Matrix3d m_uvw;
 	//Vector3d m_focal_plane_pos, m_focal_plane_dir;
 	Vector2d m_dim;
-	Vector2i m_pixel_dim;
 	double m_focal_distance;
 	double m_lens_radius;
 };

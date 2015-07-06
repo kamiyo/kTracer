@@ -4,6 +4,7 @@
 #include <Eigen/Core>
 #include <Eigen/StdVector>
 #include <Eigen/Geometry>
+#include <OpenEXR\ImfRgba.h>
 #include <cmath>
 #include <ctime>
 #include <limits>
@@ -30,6 +31,7 @@ typedef Eigen::Array4d Array4d;
 typedef Eigen::Array33d Array33d;
 typedef Eigen::Matrix<Vector2d, Eigen::Dynamic, Eigen::Dynamic> Sampler2d;
 typedef Eigen::Matrix<Vector2i, Eigen::Dynamic, Eigen::Dynamic> Sampler2i;
+typedef Eigen::Matrix<Imf::Rgba, Eigen::Dynamic, Eigen::Dynamic> MatrixRGBa;
 typedef Eigen::AffineCompact3d Transform3d;
 typedef Eigen::AffineCompact2d Transform2d;
 

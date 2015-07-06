@@ -12,7 +12,9 @@ public:
 	//Surface() {}
 	//~Surface() {}
 	//virtual bool preHit(RayBase& ray, double t0, double t1, HitRecord& record) const;
+
 	virtual bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const = 0;
+
 	/*void setTransform(Matrix4d& m) {
 		m_isTransformed = true;
 		m_inverse = m.inverse();
@@ -22,9 +24,12 @@ public:
 
 	enum { PLANE, SPHERE, CYLINDER, CONE, TORUS, TRIANGLE, FACE, CIRCLE, BOX, BOVOH, INSTANCE };
 	Material* m_material;
+
 	//Matrix4d m_inverse;
 	//Matrix4d m_transpose;
+
 	AlignedBox m_boundingBox;
+
 	//bool m_isTransformed;
 	int m_type;
 };
