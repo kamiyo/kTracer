@@ -9,11 +9,11 @@ class Parser
 {
 public:
 	Parser(const std::string filename);
-	void loadOptions(Options* o) const;
-	void loadCamera(Camera* c) const;
+	Options* loadOptions() const;
+	Camera* loadCamera() const;
 	void loadLights(std::vector<Light*>& lightVec) const;
 	void loadMaterials(std::unordered_map<std::string, Material*>& matVec) const;
-	void loadScene(Group* sVec, const std::unordered_map<std::string, Material*>& matVec) const;
+	Group* loadScene(const std::unordered_map<std::string, Material*>& matVec) const;
 	~Parser() {}
 
 private:

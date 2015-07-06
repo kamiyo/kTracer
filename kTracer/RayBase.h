@@ -27,6 +27,7 @@ public:
 	RayBase& e(Vector3d eye) { m_eye = eye; return *this; }
 	RayBase& d(Vector3d dir) { m_dir = dir;	init();	return *this; }
 
+	double epsilon() const { return m_epsilon; }
 	int type() const { return m_type; }
 	static const int VIEW = 0, SHADOW = 1, PHOTON = 2;
 

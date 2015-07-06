@@ -9,7 +9,6 @@ void BlinnPhong::calcNormalizationConst() {
 #endif
 }
 
-/* view, normal, and light vectors have to be away from intersection point (not towards) and normalized */
 RGB BlinnPhong::brdf(const Vector3d& view, const Vector3d& light, const Vector3d& normal, const RGB& intensity) const {
 	double ndotl = normal.dot(light);
 	double ndotv = normal.dot(view);

@@ -10,22 +10,27 @@ class Scene
 public:
 	Scene(const std::string filename) {
 		Parser p(filename);
-		p.loadOptions(m_options);
-		p.loadCamera(m_camera);
+		m_options = p.loadOptions();
+		m_camera = p.loadCamera();
 		p.loadMaterials(m_materials);
 		p.loadLights(m_lights);
-		p.loadScene(m_objects, m_materials);
+		m_objects = p.loadScene(m_materials);
+		m_width = m_camera->m_pixel_dim.x();
+		m_height = m_camera->m_pixel_dim.y();
 	}
 	~Scene() {
 		delete m_options;
 		delete m_camera;
+		delete m_objects;
 		m_options = nullptr;
 		m_camera = nullptr;
+		m_objects = nullptr;
 	}
 
 	void render(MatrixRGBa& output);
-	void trace(const Ray& ray, double t0, double t1, RGB&) const;
+	void trace(Ray& ray, double t0, double t1, RGB& out) const;
 
+	int m_width, m_height;
 private:
 	Options* m_options;
 	Camera* m_camera;

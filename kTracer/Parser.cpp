@@ -13,9 +13,9 @@ Parser::Parser(const std::string filename) {
 	}	
 }
 
-void Parser::loadOptions(Options* o) const {
+Options* Parser::loadOptions() const {
 	try {
-		o = new Options();
+		Options* o = new Options();
 		YAML::Node options = m_scene["options"];
 		o->AAtype(options["antialias"]["type"].as<std::string>(),
 			options["antialias"]["n"].as<int>());
@@ -26,13 +26,15 @@ void Parser::loadOptions(Options* o) const {
 		o->dof(options["depthOfField"]["type"].as<std::string>());
 		o->structure(options["structure"].as<std::string>());
 		o->renderOrder(options["order"].as<std::string>());
+		return o;
 	}
 	catch (std::exception e) {
 		std::cerr << "options: " << e.what() << std::endl;
+		return nullptr;
 	}
 }
 
-void Parser::loadCamera(Camera* c) const {
+Camera* Parser::loadCamera() const {
 	try {
 		YAML::Node camera = m_scene["camera"];
 		YAML::Node eye = camera["eye"];
@@ -61,11 +63,12 @@ void Parser::loadCamera(Camera* c) const {
 
 		double fstop = (camera["f-stop"]) ? camera["f-stop"].as<double>() : nINF;
 		double focal = (camera["focal"]) ? camera["focal"].as<double>() : nINF;
-		c = new Camera(eyeVec, dirVec, upVec, w, h, nx, ny, focal, fstop);
-
+		Camera* c = new Camera(eyeVec, dirVec, upVec, w, h, nx, ny, focal, fstop);
+		return c;
 	}
 	catch (std::exception e) {
 		std::cerr << "camera: " << e.what() << std::endl;
+		return nullptr;
 	}
 }
 
@@ -104,7 +107,6 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 	try {
 		YAML::Node materials = m_scene["materials"];
 		for (YAML::Node m : materials) {
-			//m = m["material"];
 			std::string name = m["name"].as<std::string>();
 			RGB diffuse, specular, attenuation;
 			diffuse = specular = RGB::Zero();
@@ -126,7 +128,7 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 			bool normalized = (m["normalized"]) ? m["normalized"].as<bool>() : false;
 			std::string type = m["type"].as<std::string>();
 			if (type == "blinn-phong") {
-				matVec[name] = (new BlinnPhong(name, diffuse, specular, power, normalized));
+				matVec[name] = new BlinnPhong(name, diffuse, specular, power, normalized);
 				continue;
 			}
 			if (type == "refractive") {
@@ -145,10 +147,10 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 }
 
 // still need to add transform parsing, and a bunch of other objects!
-void Parser::loadScene(Group* sVec, const std::unordered_map<std::string, Material*>& mVec) const {
+Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec) const {
 	try {
+		Group* sVec = new Group();
 		std::stack<Transform3d> transform, inverse;
-		sVec = new Group();
 		YAML::Node scene = m_scene["scene"];
 		for (YAML::Node s : scene) {
 			std::string matName = s["material"].as<std::string>();
@@ -160,21 +162,22 @@ void Parser::loadScene(Group* sVec, const std::unordered_map<std::string, Materi
 			else {
 				material = nullptr;
 			}
-			if (s["type"] = "plane") {
+			std::string type = s["type"].as<std::string>();
+			if (type == "plane") {
 				YAML::Node p = s["position"], n = s["normal"];
 				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>()),
 					normal = Vector3d(n["x"].as<double>(), n["y"].as<double>(), n["z"].as<double>());
 				sVec->push_back(new Plane(position, normal, material));
 				continue;
 			}
-			if (s["type"] = "sphere") {
+			if (type == "sphere") {
 				YAML::Node p = s["position"];
 				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>());
 				double radius = s["radius"].as<double>();
 				sVec->push_back(new Sphere(position, radius, material));
 				continue;
 			}
-			if (s["type"] = "triangle") {
+			if (type == "triangle") {
 				YAML::Node verts = s["vertices"];
 				auto v1 = verts[0];
 				auto v2 = verts[1];
@@ -186,8 +189,10 @@ void Parser::loadScene(Group* sVec, const std::unordered_map<std::string, Materi
 				continue;
 			}
 		}
+		return sVec;
 	}
 	catch (std::exception e) {
 		std::cerr << "scene: " << e.what() << std::endl;
+		return nullptr;
 	}
 }

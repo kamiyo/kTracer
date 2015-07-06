@@ -11,9 +11,31 @@ kTracer by kamiyo
 #include <iostream>
 
 int main(int argc, char** argv) {
-	std::string filename(argv[1]);
-	Scene* scene = new Scene(filename);
-	//Parser* p = new Parser(filename);
+	clock_t start = clock();
+	std::string inFile, outFile;
+	if (argc == 3) {
+		inFile = argv[1];
+		outFile = argv[2];
+	}
+	else if (argc == 2) {
+		inFile = argv[1];
+		outFile = inFile.substr(0, inFile.find_last_of('.')) + ".exr";
+	}
+	else {
+		std::cerr << "Wrong number of arguments! usage:\nkTracer scene.yaml (out.exr)" << std::endl;
+	}
+
+	Scene* scene = new Scene(inFile);
+	int width = scene->m_width, height = scene->m_height;
+
+	MatrixRGBa output;
+	scene->render(output);
+		
+	writeRgba(outFile.c_str(), output.data(), width, height);
+
+	clock_t end = clock();
+	double runtime = (double) (end - start) / CLOCKS_PER_SEC;
+	std::cout << "total runtime: " << runtime << " s" << std::endl;
 	return 0;
 
 }
