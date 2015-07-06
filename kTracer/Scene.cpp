@@ -54,7 +54,7 @@ void Scene::trace(Ray& ray, double t0, double t1, RGB& out) const {
 			const Vector3d light = l->getVector(xpoint);
 			Ray shadowRay(xpoint, light, RayBase::SHADOW);
 			HitRecord shadowRecord;
-			if (!m_objects->hit(shadowRay, t0 + shadowRay.epsilon(), 1.0, shadowRecord)) {
+			if (!m_objects->hit(shadowRay, shadowRay.epsilon(), 1.0, shadowRecord)) {
 				out += record.material->brdf(ray.d().normalized(), light.normalized(), record.normal, l->i());
 			}
 		}

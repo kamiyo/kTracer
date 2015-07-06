@@ -11,6 +11,8 @@ public:
 	}
 	~AlignedBox() {}
 	
+	Vector3d min() const { return m_box[0]; }
+	Vector3d max() const { return m_box[1]; }
 	inline Vector3d& min() { return m_box[0]; }
 	inline Vector3d& max() { return m_box[1]; }
 	inline Vector3d mid() { return m_midpoint; }
