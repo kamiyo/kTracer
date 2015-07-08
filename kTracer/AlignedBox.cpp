@@ -1,6 +1,9 @@
 #include "AlignedBox.h"
 
 bool AlignedBox::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
+	if (isEmpty()) { return false; }
+	if (isInfinite()) { return true; }
+
 	double tmin, tmax, tymin, tymax, tzmin, tzmax;
 	const Vector3d e = ray.e();
 	const Vector3d i = ray.i();

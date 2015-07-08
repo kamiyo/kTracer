@@ -11,6 +11,7 @@ public:
 	{
 		m_material = material;
 		m_type = Surface::SPHERE;
+		m_boundingBox = AlignedBox(position - Vector3d::Constant(radius), position + Vector3d::Constant(radius));
 	}
 	~Sphere() {}
 

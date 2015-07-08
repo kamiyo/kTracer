@@ -149,7 +149,8 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 // still need to add transform parsing, and a bunch of other objects!
 Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec) const {
 	try {
-		Group* sVec = new Group();
+		Group* objVec = new Group();
+		Group* planeVec = new Group();
 		std::stack<Transform3d> transform, inverse;
 		YAML::Node scene = m_scene["scene"];
 		for (YAML::Node s : scene) {
@@ -167,14 +168,14 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 				YAML::Node p = s["position"], n = s["normal"];
 				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>()),
 					normal = Vector3d(n["x"].as<double>(), n["y"].as<double>(), n["z"].as<double>());
-				sVec->push_back(new Plane(position, normal, material));
+				planeVec->push_back(new Plane(position, normal, material));
 				continue;
 			}
 			if (type == "sphere") {
 				YAML::Node p = s["position"];
 				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>());
 				double radius = s["radius"].as<double>();
-				sVec->push_back(new Sphere(position, radius, material));
+				objVec->push_back(new Sphere(position, radius, material));
 				continue;
 			}
 			if (type == "triangle") {
@@ -185,11 +186,13 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 				Vector3d vert1 = Vector3d(v1["x"].as<double>(), v1["y"].as<double>(), v1["z"].as<double>());
 				Vector3d vert2 = Vector3d(v2["x"].as<double>(), v2["y"].as<double>(), v2["z"].as<double>());
 				Vector3d vert3 = Vector3d(v3["x"].as<double>(), v3["y"].as<double>(), v3["z"].as<double>());
-				sVec->push_back(new Triangle(vert1, vert2, vert3, material));
+				objVec->push_back(new Triangle(vert1, vert2, vert3, material));
 				continue;
 			}
 		}
-		return sVec;
+		Group* masterVec = new Group();
+		masterVec->push_back(planeVec)->push_back(objVec);
+		return masterVec;
 	}
 	catch (std::exception e) {
 		std::cerr << "scene: " << e.what() << std::endl;

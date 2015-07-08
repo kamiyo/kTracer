@@ -12,6 +12,7 @@ public:
 		m_material = material;
 		m_normal.normalize();
 		m_type = Surface::PLANE;
+		m_boundingBox = AlignedBox::Infinite();
 	}
 	~Plane() {}
 

@@ -17,6 +17,9 @@ Triangle::Triangle(Vector3d p1, Vector3d p2, Vector3d p3, Material* m)
 	m_u1 = m_p2[m_axis_1] - m_p1[m_axis_1]; m_u2 = m_p3[m_axis_1] - m_p1[m_axis_1];
 	m_v1 = m_p2[m_axis_2] - m_p1[m_axis_2]; m_v2 = m_p3[m_axis_2] - m_p1[m_axis_2];
 	m_denominator = m_u1 * m_v2 - m_u2 - m_v1;
+	
+	m_boundingBox = AlignedBox(p1);
+	m_boundingBox.extend(p2).extend(p3);
 }
 
 bool Triangle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
