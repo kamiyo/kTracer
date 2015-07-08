@@ -7,7 +7,7 @@ Ray Camera::generateRay(const double x, const double y) const {
 
 	// deal with lens blur
 
-	Vector3d dir = point.transpose() * m_uvw;
+	Vector3d dir = m_uvw * point;
 
 	return Ray(m_eye, dir, Ray::VIEW);
 }

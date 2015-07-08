@@ -161,6 +161,7 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 				material = m->second;
 			}
 			else {
+				throw std::exception("material not found!");
 				material = nullptr;
 			}
 			std::string type = s["type"].as<std::string>();

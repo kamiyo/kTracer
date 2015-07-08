@@ -15,8 +15,8 @@ options:
 
 #setup camera
 camera:
-    eye:    {x: 0.0, y: 0.0, z: 0.0}
-    dir:    {x: 0.0, y: 0.0, z: 0.3}
+    eye:    {x: 0.0, y: 0.0, z: 7.0}
+    dir:    {x: 0.0, y: 0.0, z: 3.0}
     up:     {x: 0.0, y: 1.0, z: 0.0}
     image:  {w: 6.0, h: 4.5}
     pixels: {w: 400, h: 300}
@@ -28,7 +28,7 @@ materials:
       name: red 
       diffuse: {r: 0.8, g: 0.2, b: 0.2}
 
-    - type: reflective
+    - type: blinn-phong
       name: blue
       diffuse: {r: 0.2, g: 0.2, b: 0.8}
       specular: {r: 0.2, g: 0.2, b: 0.8}
@@ -91,9 +91,9 @@ scene:
     - type: sphere
       position: {x: -2, y: -2, z: -2}
       radius: 1
-      material: glass
+      material: blue
     - type: sphere
       position: {x: 2, y: -2, z: -2}
       radius: 1
-      material: glass
+      material: blue
 ...
