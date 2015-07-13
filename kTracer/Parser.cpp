@@ -183,7 +183,7 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 			}
 			if (type == "sphere") {
 				YAML::Node p = s["position"];
-				Vector3d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1);
+				Vector4d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1);
 				double radius = s["radius"].as<double>();
 				objVec->push_back(new Sphere(position, radius, material));
 				continue;

@@ -12,10 +12,9 @@ Triangle::Triangle(Vector4d p1, Vector4d p2, Vector4d p3, Material* m)
 {
 	m_material = m;
 	m_type = Surface::TRIANGLE;
-	m_matrix.resize(3, 4);
+	m_matrix.resize(4, 3);
 	m_matrix << m_e1, m_e2, m_normal;
-	m_matrix = m_matrix.transpose().block<3, 3>(0, 0).inverse();
-	std::cout << m_matrix.rows() << " " << m_matrix.cols() << std::endl;
+	m_matrix.block<3, 3>(0, 0) = m_matrix.block<3, 3>(0, 0).transpose().inverse();
 
 	m_boundingBox = AlignedBox(p1);
 	m_boundingBox.extend(p2).extend(p3);
