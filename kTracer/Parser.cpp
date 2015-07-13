@@ -38,20 +38,20 @@ Camera* Parser::loadCamera() const {
 	try {
 		YAML::Node camera = m_scene["camera"];
 		YAML::Node eye = camera["eye"];
-		Vector3d eyeVec(eye["x"].as<double>(), eye["y"].as<double>(), eye["z"].as<double>());
-		Vector3d dirVec;
+		Vector4d eyeVec(eye["x"].as<double>(), eye["y"].as<double>(), eye["z"].as<double>(), 1);
+		Vector4d dirVec;
 		if (camera["dir"]) {
 			YAML::Node dir = camera["dir"];
-			dirVec = Vector3d(dir["x"].as<double>(), dir["y"].as<double>(), dir["z"].as<double>());
+			dirVec << dir["x"].as<double>(), dir["y"].as<double>(), dir["z"].as<double>(), 0;
 		}
 		else if (camera["at"]) {
 			YAML::Node at = camera["at"];
-			Vector3d atVec(at["x"].as<double>(), at["y"].as<double>(), at["z"].as<double>());
+			Vector4d atVec(at["x"].as<double>(), at["y"].as<double>(), at["z"].as<double>(), 1);
 			dirVec = atVec - eyeVec;
 		}
 
 		YAML::Node up = camera["up"];
-		Vector3d upVec(up["x"].as<double>(), up["y"].as<double>(), up["z"].as<double>());
+		Vector4d upVec(up["x"].as<double>(), up["y"].as<double>(), up["z"].as<double>(), 0);
 
 		YAML::Node image = camera["image"];
 		double w = image["w"].as<double>();
@@ -78,20 +78,26 @@ void Parser::loadLights(std::vector<Light*>& lightVec) const {
 		for (YAML::Node l : lights) {
 			//l = l["light"];
 			double size = (l["size"]) ? l["size"].as<double>() : 0.0;
-			Vector3d attenuation(1.0, 0.0, 0.0);
+			Vector4d attenuation(1.0, 0.0, 0.0, 0.0);
+
 			YAML::Node i = l["intensity"];
-			RGB intensity = RGB(i["r"].as<double>(), i["g"].as<double>(), i["b"].as<double>());
+			Rgba intensity(i["r"].as<double>(), i["g"].as<double>(), i["b"].as<double>(), 0);
 			std::string type = l["type"].as<std::string>();
+
+			if (l["attenuation"]) {
+				YAML::Node a = l["attenuation"];
+				attenuation << a["constant"].as<double>(), a["linear"].as<double>(), a["squared"].as<double>(), 0;
+			}
 
 			if (type == "point") {
 				YAML::Node p = l["position"];
-				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>());
+				Vector4d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1);
 				lightVec.push_back(new PointLight(position, intensity, attenuation, size));
 				continue;
 			}
 			if (type == "directional") {
 				YAML::Node d = l["direction"];
-				Vector3d direction = Vector3d(d["x"].as<double>(), d["y"].as<double>(), d["z"].as<double>());
+				Vector4d direction(d["x"].as<double>(), d["y"].as<double>(), d["z"].as<double>(), 0);
 				lightVec.push_back(new DirectionalLight(direction, intensity, size));
 				continue;
 			}
@@ -108,20 +114,20 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 		YAML::Node materials = m_scene["materials"];
 		for (YAML::Node m : materials) {
 			std::string name = m["name"].as<std::string>();
-			RGB diffuse, specular, attenuation;
-			diffuse = specular = RGB::Zero();
-			attenuation = RGB::Ones();
+			Rgba diffuse, specular, attenuation;
+			diffuse = specular = Rgba::Zero();
+			attenuation << 1, 1, 1, 0;
 			if (m["diffuse"]) {
 				YAML::Node d = m["diffuse"];
-				diffuse = RGB(d["r"].as<double>(), d["g"].as<double>(), d["b"].as<double>());
+				diffuse << d["r"].as<double>(), d["g"].as<double>(), d["b"].as<double>(), 0;
 			}
 			if (m["specular"]) {
 				YAML::Node s = m["specular"];
-				specular = RGB(s["r"].as<double>(), s["g"].as<double>(), s["b"].as<double>());
+				specular <<  s["r"].as<double>(), s["g"].as<double>(), s["b"].as<double>(), 0;
 			}
 			if (m["attenuation"]) {
 				YAML::Node a = m["attenuation"];
-				attenuation = RGB(a["r"].as<double>(), a["g"].as<double>(), a["b"].as<double>());
+				attenuation << a["r"].as<double>(), a["g"].as<double>(), a["b"].as<double>(), 0;
 			}
 			double index = (m["index"]) ? m["index"].as<double>() : 1.0;
 			unsigned int power = (m["power"]) ? m["power"].as<unsigned int>() : 1u;
@@ -170,14 +176,14 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 			std::string type = s["type"].as<std::string>();
 			if (type == "plane") {
 				YAML::Node p = s["position"], n = s["normal"];
-				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>()),
-					normal = Vector3d(n["x"].as<double>(), n["y"].as<double>(), n["z"].as<double>());
+				Vector4d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1)
+					   , normal(n["x"].as<double>(), n["y"].as<double>(), n["z"].as<double>(), 0);
 				planeVec->push_back(new Plane(position, normal, material));
 				continue;
 			}
 			if (type == "sphere") {
 				YAML::Node p = s["position"];
-				Vector3d position = Vector3d(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>());
+				Vector3d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1);
 				double radius = s["radius"].as<double>();
 				objVec->push_back(new Sphere(position, radius, material));
 				continue;
@@ -187,9 +193,9 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 				auto v1 = verts[0];
 				auto v2 = verts[1];
 				auto v3 = verts[2];
-				Vector3d vert1 = Vector3d(v1["x"].as<double>(), v1["y"].as<double>(), v1["z"].as<double>());
-				Vector3d vert2 = Vector3d(v2["x"].as<double>(), v2["y"].as<double>(), v2["z"].as<double>());
-				Vector3d vert3 = Vector3d(v3["x"].as<double>(), v3["y"].as<double>(), v3["z"].as<double>());
+				Vector4d vert1(v1["x"].as<double>(), v1["y"].as<double>(), v1["z"].as<double>(), 1)
+					, vert2(v2["x"].as<double>(), v2["y"].as<double>(), v2["z"].as<double>(), 1)
+					, vert3(v3["x"].as<double>(), v3["y"].as<double>(), v3["z"].as<double>(), 1);
 				objVec->push_back(new Triangle(vert1, vert2, vert3, material));
 				continue;
 			}

@@ -6,7 +6,7 @@ class RayBase
 {
 public:
 	~RayBase() {}
-	RayBase(Vector3d eye, Vector3d dir, int type)
+	RayBase(Vector4d eye, Vector4d dir, int type)
 	: m_eye(eye)
 	, m_dir(dir)
 	, m_type(type)
@@ -18,22 +18,22 @@ public:
 		m_sign = (m_inv.array() < 0).cast<int>();
 	}
 
-	Vector3d getPoint(double t) const {	return m_eye + t * m_dir; }
-	Vector3d e() const { return m_eye; }
-	Vector3d d() const { return m_dir; }
-	Vector3d i() const { return m_inv; }
-	Vector3i s() const { return m_sign; }
+	Vector4d getPoint(double t) const {	return m_eye + t * m_dir; }
+	Vector4d e() const { return m_eye; }
+	Vector4d d() const { return m_dir; }
+	Vector4d i() const { return m_inv; }
+	Array4i s() const { return m_sign; }
 	
-	RayBase& e(Vector3d eye) { m_eye = eye; return *this; }
-	RayBase& d(Vector3d dir) { m_dir = dir;	init();	return *this; }
+	RayBase& e(Vector4d eye) { m_eye = eye; return *this; }
+	RayBase& d(Vector4d dir) { m_dir = dir;	init();	return *this; }
 
 	double epsilon() const { return m_epsilon; }
 	int type() const { return m_type; }
 	static const int VIEW = 0, SHADOW = 1, PHOTON = 2;
 
 protected:
-	Vector3d m_eye, m_dir, m_inv;
-	Vector3i m_sign;
+	Vector4d m_eye, m_dir, m_inv;
+	Array4i m_sign;
 	double m_epsilon;
 	int m_type;
 };

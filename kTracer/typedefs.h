@@ -16,6 +16,8 @@
 #define EULER 2.718281828459045235360287471352
 #define EPSILON 0.0001
 #define M_1_PI 0.31830988618379067154 // 1/pi
+#define INF4DPOINT Vector4d(INF, INF, INF, 1)
+#define nINF4DPOINT Vector4d(nINF, nINF, nINF, 1)
 
 typedef Eigen::Vector2d Vector2d;
 typedef Eigen::Vector2i Vector2i;
@@ -26,10 +28,13 @@ typedef Eigen::Array3d Rgb;
 typedef Eigen::Array4d Rgba;
 typedef Eigen::Vector3i Vector3i;
 typedef Eigen::Vector4d Vector4d;
+typedef Eigen::Vector4i Vector4i;
 typedef Eigen::AngleAxisd AngleAxisd;
 typedef Eigen::Array2d Array2d;
 typedef Eigen::Array4d Array4d;
+typedef Eigen::Array4i Array4i;
 typedef Eigen::Array33d Array33d;
+typedef Eigen::MatrixXd MatrixXd;
 typedef Eigen::Matrix<Vector2d, Eigen::Dynamic, Eigen::Dynamic> Sampler2d;
 typedef Eigen::Matrix<Vector2i, Eigen::Dynamic, Eigen::Dynamic> Sampler2i;
 typedef Eigen::Matrix<Imf::Rgba, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRgba;

@@ -1,7 +1,7 @@
 #include "Sphere.h"
 
 bool Sphere::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
-	const Vector3d ep = ray.e() - m_position;
+	const Vector4d ep = ray.e() - m_position;
 	const double dep = ray.d().dot(ep);
 	const double dd = ray.d().squaredNorm();
 	double discriminant = dep * dep - dd * (ep.squaredNorm() - m_radius_2);

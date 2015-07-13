@@ -2,21 +2,21 @@
 
 const double Triangle::M_EPSILON = 1e-6;
 
-Triangle::Triangle(Vector3d p1, Vector3d p2, Vector3d p3, Material* m)
+Triangle::Triangle(Vector4d p1, Vector4d p2, Vector4d p3, Material* m)
 	: m_p1(p1)
 	, m_p2(p2)
 	, m_p3(p3)
 	, m_e1(p2 - p1)
 	, m_e2(p3 - p1)
-	, m_normal((p2 - p1).cross(p3 - p1).normalized())
-	//, m_NP(-m_normal.dot(p1))
+	, m_normal((p2 - p1).cross3(p3 - p1).normalized())
 {
 	m_material = m;
 	m_type = Surface::TRIANGLE;
-
+	m_matrix.resize(3, 4);
 	m_matrix << m_e1, m_e2, m_normal;
-	m_matrix = m_matrix.transpose().inverse();
-	
+	m_matrix = m_matrix.transpose().block<3, 3>(0, 0).inverse();
+	std::cout << m_matrix.rows() << " " << m_matrix.cols() << std::endl;
+
 	m_boundingBox = AlignedBox(p1);
 	m_boundingBox.extend(p2).extend(p3);
 }
@@ -28,7 +28,7 @@ bool Triangle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const 
 	double t = numerator / denominator;
 	if (t < t0 || t > t1) { return false; }
 
-	Vector3d point = ray.getPoint(t) - m_p1;
+	Vector4d point = ray.getPoint(t) - m_p1;
 	double u = point.dot(m_matrix.col(0));
 	if (u < 0.0) return false;
 	double v = point.dot(m_matrix.col(1));

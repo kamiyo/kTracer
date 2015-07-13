@@ -8,7 +8,7 @@ public:
 	HitRecord() {}
 	~HitRecord() {}
 	double t;
-	Vector3d normal;
+	Vector4d normal;
 	Material* material;
 };
 

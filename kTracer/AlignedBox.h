@@ -4,7 +4,7 @@ class AlignedBox :
 	public Intersectable
 {
 public:
-	AlignedBox() { min() = Vector4d::Constant(INF), max() = Vector4d::Constant(nINF); }
+	AlignedBox() { min() = INF4DPOINT, max() = nINF4DPOINT; }
 	AlignedBox(Vector4d point) {
 		min() = max() = point;
 		m_midpoint = (min() + max()) / 2.0;
@@ -22,8 +22,8 @@ public:
 	inline Vector4d mid() { return m_midpoint; }
 	inline bool isEmpty() const { return (max().array() < min().array()).any(); }
 	inline bool isInfinite() const {
-		return (max().cwiseEqual(Vector4d::Constant(INF)).all()
-			 && min().cwiseEqual(Vector4d::Constant(nINF)).all());
+		return (max().cwiseEqual(INF4DPOINT).all()
+			&& min().cwiseEqual(nINF4DPOINT).all());
 	}
 
 	AlignedBox& extend(AlignedBox& other) {
@@ -55,7 +55,7 @@ public:
 		return ((min().cwiseNotEqual(rhs.min()).any() || max().cwiseNotEqual(rhs.max()).any()));
 	}
 
-	static inline AlignedBox Infinite() { return AlignedBox(Vector3d::Constant(nINF), Vector3d::Constant(INF)); }
+	static inline AlignedBox Infinite() { return AlignedBox(nINF4DPOINT, INF4DPOINT); }
 
 private:
 	Vector4d m_box[2];

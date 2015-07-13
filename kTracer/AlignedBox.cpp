@@ -5,9 +5,9 @@ bool AlignedBox::hit(RayBase& ray, double t0, double t1, HitRecord& record) cons
 	if (isInfinite()) { return true; }
 
 	double tmin, tmax, tymin, tymax, tzmin, tzmax;
-	const Vector3d e = ray.e();
-	const Vector3d i = ray.i();
-	const Vector3i s = ray.s();
+	const Vector3d e = ray.e().head(3);
+	const Vector3d i = ray.i().head(3);
+	const Vector3i s = ray.s().head(3);
 
 	tmin = (m_box[s[0]][0] - e[0]) * i[0];
 	tmax = (m_box[1 - s[0]][0] - e[0]) * i[0];
@@ -42,7 +42,7 @@ void AlignedBox::transform(const Transform3d& t) {
 			}
 		}
 	}
-	min() = rmin;
-	max() = rmax;
+	min() << rmin, 0;
+	max() << rmax, 0;
 	m_midpoint = (min() + max()) / 2.0;
 }

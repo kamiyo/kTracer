@@ -9,7 +9,7 @@ void BlinnPhong::calcNormalizationConst() {
 #endif
 }
 
-RGB BlinnPhong::brdf(const Vector3d& view, const Vector3d& light, const Vector3d& normal, const RGB& intensity) const {
+Rgba BlinnPhong::brdf(const Vector4d& view, const Vector4d& light, const Vector4d& normal, const Rgba& intensity) const {
 	double ndotv = normal.dot(view);
 	double ndotl = normal.dot(light);
 	double ndoth = normal.dot((light + view).normalized());
