@@ -10,8 +10,9 @@ void BlinnPhong::calcNormalizationConst() {
 }
 
 RGB BlinnPhong::brdf(const Vector3d& view, const Vector3d& light, const Vector3d& normal, const RGB& intensity) const {
-	double ndotl = normal.dot(light);
 	double ndotv = normal.dot(view);
+	double ndotl = normal.dot(light);
 	double ndoth = normal.dot((light + view).normalized());
+	if (ndotv < 0) { ndotv = -ndotv; ndotl = -ndotl; ndoth = -ndoth; }
 	return m_diffuse * intensity * std::max(0.0, ndotl) + m_specular * std::pow(ndoth, m_power);	// ndoth is always >= 0 (half vector max is perpendicular)
 }

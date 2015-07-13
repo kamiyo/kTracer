@@ -27,8 +27,8 @@ public:
 		m_objects = nullptr;
 	}
 
-	void render(MatrixRGBa& output);
-	void trace(Ray& ray, double t0, double t1, RGB& out) const;
+	void render(MatrixRgba& output);
+	void trace(Ray& ray, double t0, double t1, Rgb& out) const;
 
 	int m_width, m_height;
 private:

@@ -149,6 +149,9 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 // still need to add transform parsing, and a bunch of other objects!
 Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec) const {
 	try {
+		for (auto things : mVec) {
+			std::cout << things.first << std::endl;
+		}
 		Group* objVec = new Group();
 		Group* planeVec = new Group();
 		std::stack<Transform3d> transform, inverse;
@@ -192,7 +195,7 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 			}
 		}
 		Group* masterVec = new Group();
-		masterVec->push_back(planeVec)->push_back(objVec);
+		masterVec->push_back(objVec)->push_back(planeVec);
 		return masterVec;
 	}
 	catch (std::exception e) {

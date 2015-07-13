@@ -22,7 +22,8 @@ typedef Eigen::Vector2i Vector2i;
 typedef Eigen::Matrix3d Matrix3d;
 typedef Eigen::Matrix4d Matrix4d;
 typedef Eigen::Vector3d Vector3d;
-typedef Eigen::Array3d RGB;
+typedef Eigen::Array3d Rgb;
+typedef Eigen::Array4d Rgba;
 typedef Eigen::Vector3i Vector3i;
 typedef Eigen::Vector4d Vector4d;
 typedef Eigen::AngleAxisd AngleAxisd;
@@ -31,8 +32,8 @@ typedef Eigen::Array4d Array4d;
 typedef Eigen::Array33d Array33d;
 typedef Eigen::Matrix<Vector2d, Eigen::Dynamic, Eigen::Dynamic> Sampler2d;
 typedef Eigen::Matrix<Vector2i, Eigen::Dynamic, Eigen::Dynamic> Sampler2i;
-typedef Eigen::Matrix<Imf::Rgba, Eigen::Dynamic, Eigen::Dynamic> MatrixRGBa;
-typedef Eigen::AffineCompact3d Transform3d;
+typedef Eigen::Matrix<Imf::Rgba, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRgba;
+typedef Eigen::Affine3d Transform3d;
 typedef Eigen::AffineCompact2d Transform2d;
 
 template <typename Object>

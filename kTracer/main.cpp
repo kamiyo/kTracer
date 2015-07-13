@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 	Scene* scene = new Scene(inFile);
 	int width = scene->m_width, height = scene->m_height;
 
-	MatrixRGBa output;
+	MatrixRgba output;
 	scene->render(output);
 		
 	writeRgba(outFile.c_str(), output.data(), width, height);

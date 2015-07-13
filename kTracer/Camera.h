@@ -12,11 +12,12 @@ public:
 		, m_dim(Vector2d(width, height))
 		, m_pixel_dim(Vector2i(pixelw, pixelh))
 	{
-		Vector3d w = -m_dir.normalized();
-		Vector3d u = (up.cross(w)).normalized();
-		Vector3d v = (w.cross(u)).normalized();
-		m_uvw << u, v, w;
-		m_focal_distance = (focal == nINF) ? m_dir.norm() : focal;
+		m_focal_distance = (focal == nINF) ? dir.norm() : focal;
+		m_w = -m_dir;
+		m_u = (up.cross(m_w)).normalized();
+		m_v = (m_w.cross(m_u)).normalized();
+		m_uvw << m_u, m_v, m_w;
+		m_uvw.transposeInPlace();
 		m_lens_radius = (fstop == nINF) ? 0.0 : m_focal_distance / fstop;
 	}
 	~Camera() {}
@@ -27,7 +28,7 @@ public:
 
 private:
 	Vector3d m_eye, m_dir;
-	//Vector3d m_u, m_v, m_w;
+	Vector3d m_u, m_v, m_w;
 	Matrix3d m_uvw;
 	//Vector3d m_focal_plane_pos, m_focal_plane_dir;
 	Vector2d m_dim;

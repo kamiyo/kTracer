@@ -11,9 +11,11 @@ public:
 	bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const;
 	
 private:
-	Vector3d m_p1, m_p2, m_p3, m_normal;
-	double m_NP;
-	double m_u1, m_u2, m_v1, m_v2;
+	static const double M_EPSILON;
+	Vector3d m_p1, m_p2, m_p3;
+	Vector3d m_e1, m_e2;
+	Vector3d m_normal;
+	Matrix3d m_matrix;
 	double m_denominator;
 	int m_axis_1, m_axis_2;
 };

@@ -4,24 +4,27 @@ class AlignedBox :
 	public Intersectable
 {
 public:
-	AlignedBox() { min() = Vector3d::Constant(INF), max() = Vector3d::Constant(nINF); }
-	AlignedBox(Vector3d point) {
-		min() = max() = point; 
+	AlignedBox() { min() = Vector4d::Constant(INF), max() = Vector4d::Constant(nINF); }
+	AlignedBox(Vector4d point) {
+		min() = max() = point;
 		m_midpoint = (min() + max()) / 2.0;
 	}
-	AlignedBox(Vector3d newmin, Vector3d newmax) {
+	AlignedBox(Vector4d newmin, Vector4d newmax) {
 		min() = newmin, max() = newmax;
 		m_midpoint = (min() + max()) / 2.0;
 	}
 	~AlignedBox() {}
 	
-	Vector3d min() const { return m_box[0]; }
-	Vector3d max() const { return m_box[1]; }
-	inline Vector3d& min() { return m_box[0]; }
-	inline Vector3d& max() { return m_box[1]; }
-	inline Vector3d mid() { return m_midpoint; }
+	Vector4d min() const { return m_box[0]; }
+	Vector4d max() const { return m_box[1]; }
+	inline Vector4d& min() { return m_box[0]; }
+	inline Vector4d& max() { return m_box[1]; }
+	inline Vector4d mid() { return m_midpoint; }
 	inline bool isEmpty() const { return (max().array() < min().array()).any(); }
-	inline bool isInfinite() const { return (max().cwiseEqual(Vector3d::Constant(INF)).all() && min().cwiseEqual(Vector3d::Constant(nINF)).all()); }
+	inline bool isInfinite() const {
+		return (max().cwiseEqual(Vector4d::Constant(INF)).all()
+			 && min().cwiseEqual(Vector4d::Constant(nINF)).all());
+	}
 
 	AlignedBox& extend(AlignedBox& other) {
 		min() = min().cwiseMin(other.min());
@@ -30,7 +33,7 @@ public:
 		return *this;
 	}
 
-	AlignedBox& extend(const Vector3d& point) {
+	AlignedBox& extend(const Vector4d& point) {
 		min() = min().cwiseMin(point);
 		max() = max().cwiseMax(point);
 		m_midpoint = (min() + max()) / 2.0;
@@ -55,7 +58,7 @@ public:
 	static inline AlignedBox Infinite() { return AlignedBox(Vector3d::Constant(nINF), Vector3d::Constant(INF)); }
 
 private:
-	Vector3d m_box[2];
-	Vector3d m_midpoint;
+	Vector4d m_box[2];
+	Vector4d m_midpoint;
 };
 
