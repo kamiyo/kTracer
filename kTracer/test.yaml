@@ -1,8 +1,8 @@
 --- #setup scene
 options:
     antialias:
-        type: nrooks
-        n: 3
+        type: halton
+        n: 16
     shadows:
         type: soft
         shape: circle

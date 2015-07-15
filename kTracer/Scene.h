@@ -2,6 +2,8 @@
 
 #include "Objects.h"
 #include "Parser.h"
+#include "Sampler.h"
+#include "utils.h"
 #include <OpenEXR\ImfRgba.h>
 #include <unordered_map>
 
@@ -17,6 +19,7 @@ public:
 		m_objects = p.loadScene(m_materials);
 		m_width = m_camera->m_pixel_dim.x();
 		m_height = m_camera->m_pixel_dim.y();
+		seedRand();
 	}
 	~Scene() {
 		delete m_options;

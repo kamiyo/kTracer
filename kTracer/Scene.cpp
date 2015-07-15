@@ -13,14 +13,26 @@ void Scene::render(MatrixRgba& output) {
 	for (int h = 0; h < height; ++h) {
 		clock_t inner_start = clock();
 		int startray = Ray::count;
+
 #pragma omp parallel for schedule(dynamic)
-
 		for (int w = 0; w < width; ++w) {
-			Rgba result;
-
-			Ray view = m_camera->generateRay((double) w + 0.5, (double) h + 0.5);
-			trace(view, 0.0, INF, result);
+			Sampler* s = m_options->getAASampler();
+			s->genPoints();
+			int number_samples = m_options->m_samples;
+			Sampler2d samples = s->getSamples();
+			Eigen::Matrix<Rgba, Eigen::Dynamic, 1> results(number_samples * number_samples);
 			
+			for (int m = 0; m < number_samples * number_samples; m++) {
+				Vector2d smn = samples(m);
+				Ray view = m_camera->generateRay((double) w + smn.x(), (double) h + smn.y());
+				trace(view, 0.0, INF, results(m));
+			}
+
+			Rgba result = Rgba::Zero();
+			for (int i = 0; i < (int) results.size(); i++) {
+				result += results(i);
+			}
+			result /= (double) results.size();
 			int revHeight = height - h - 1;
 			output(revHeight, w) = Imf::Rgba((float)result.x(), (float)result.y(), (float)result.z());
 		}
@@ -45,7 +57,7 @@ void Scene::trace(Ray& ray, double t0, double t1, Rgba& out) const {
 	HitRecord record;
 	out = Rgba::Zero();
 	if (m_objects->hit(ray, t0, t1, record)) {
-		const Vector4d xpoint = ray.getPoint(record.t);
+		const Vector4d xpoint = ray(record.t);
 		std::string name = record.material->m_name;
 		for (Light* l : m_lights) {
 			const Vector4d light = l->getVector(xpoint);

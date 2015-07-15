@@ -13,7 +13,7 @@ bool Sphere::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
 		record.t = t;
 		if (ray.type() == RayBase::SHADOW) { return true; }
 
-		record.normal = (ray.getPoint(t) - m_position).normalized();
+		record.normal = (ray(t) - m_position).normalized();
 		record.material = m_material;
 		return true;
 	}
@@ -29,7 +29,7 @@ bool Sphere::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
 		record.t = t;
 		if (ray.type() == RayBase::SHADOW) { return true; }
 
-		record.normal = (ray.getPoint(t) - m_position).normalized();
+		record.normal = (ray(t) - m_position).normalized();
 		record.material = m_material;
 		return true;
 	}
@@ -38,7 +38,7 @@ bool Sphere::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
 	record.t = t;
 	if (ray.type() == RayBase::SHADOW) { return true; }
 
-	record.normal = (ray.getPoint(t) - m_position).normalized();
+	record.normal = (ray(t) - m_position).normalized();
 	record.material = m_material;
 	return true;
 }

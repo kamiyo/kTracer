@@ -18,7 +18,7 @@ public:
 		m_sign = (m_inv.array() < 0).cast<int>();
 	}
 
-	Vector4d getPoint(double t) const {	return m_eye + t * m_dir; }
+	Vector4d operator()(double t) const {	return m_eye + t * m_dir; }
 	Vector4d e() const { return m_eye; }
 	Vector4d d() const { return m_dir; }
 	Vector4d i() const { return m_inv; }

@@ -135,6 +135,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Group.h" />
+    <ClInclude Include="Hilbert.h" />
     <ClInclude Include="HitRecord.h" />
     <ClInclude Include="Intersectable.h" />
     <ClInclude Include="Light.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayBase.h" />
+    <ClInclude Include="Sampler.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Surface.h" />
@@ -160,9 +162,9 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Group.cpp" />
+    <ClCompile Include="Hilbert.cpp" />
     <ClCompile Include="Intersectable.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Options.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="PointLight.cpp" />
@@ -172,6 +174,7 @@
     <ClCompile Include="Surface.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="typedefs.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scene.yaml" />

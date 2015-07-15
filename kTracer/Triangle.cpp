@@ -27,7 +27,7 @@ bool Triangle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const 
 	double t = numerator / denominator;
 	if (t < t0 || t > t1) { return false; }
 
-	Vector4d point = ray.getPoint(t) - m_p1;
+	Vector4d point = ray(t) - m_p1;
 	double u = point.dot(m_matrix.col(0));
 	if (u < 0.0) return false;
 	double v = point.dot(m_matrix.col(1));
@@ -39,25 +39,3 @@ bool Triangle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const 
 	record.material = m_material;
 	return true;
 }
-
-//bool Triangle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
-//	Vector3d P = ray.d().cross(m_e2);
-//	double denominator = m_e1.dot(P);
-//	//if (abs(det) < M_EPSILON) { return false; }
-//	if (denominator == 0) { return false; }
-//
-//	denominator = 1.0 / denominator;
-//	Vector3d T = ray.e() - m_p1;
-//	double u = T.dot(P) * denominator;
-//	if (u < 0.0 || u > 1.0) { return false; }
-//
-//	Vector3d Q = T.cross(m_e1);
-//	double v = Q.dot(ray.d()) * denominator;
-//	if (v < 0.0 || u + v > 1.0) { return false; }
-//
-//	record.t = m_e2.dot(Q) * denominator;
-//	if (ray.type() == RayBase::SHADOW) { return true; }
-//	record.normal = m_normal;
-//	record.material = m_material;
-//	return true;
-//}
