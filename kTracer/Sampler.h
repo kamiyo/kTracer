@@ -11,43 +11,55 @@ public:
 	virtual Sampler2d getSamples() {
 		return m_samples;
 	}
-	void shuffle(bool together = false) {
+
+	template <typename T>
+	static inline void shuffle(Eigen::Matrix<T, -1, -1>& samples) {
+		int random;
+		for (int i = (int) samples.size() - 1; i > 0; i--) {
+			random = genRand_int(0, i);
+			std::swap(samples(i), samples(random));
+		}
+		return;
+	}
+
+	static inline void shuffle(Sampler2d& samples, bool together = false) {
 		if (together) {
 			int random;
-			for (int i = (int) m_samples.size() - 1; i > 0; i--) {
+			for (int i = (int) samples.size() - 1; i > 0; i--) {
 				random = genRand_int(0, i);
-				std::swap(m_samples(i), m_samples(random));
+				std::swap(samples(i), samples(random));
 			}
 			return;
 		}
 		else {
 			int randomx, randomy;
-			for (int i = (int) m_samples.size() - 1; i > 0; i--) {
+			for (int i = (int) samples.size() - 1; i > 0; i--) {
 				randomx = genRand_int(0, i);
 				randomy = genRand_int(0, i);
-				std::swap(m_samples(i).x(), m_samples(randomx).x());
-				std::swap(m_samples(i).y(), m_samples(randomy).y());
+				std::swap(samples(i).x(), samples(randomx).x());
+				std::swap(samples(i).y(), samples(randomy).y());
 			}
 			return;
 		}
 	}
 
-	void shuffle_correlated() {
+	static inline void shuffle_correlated(Sampler2d& samples) {
 		int random;
-		for (int j = m_height - 1; j > 0; j--) {
+		int height = (int)samples.rows(), width = (int)samples.cols();
+		for (int j = height - 1; j > 0; j--) {
 			random = genRand_int(0, j);
-			for (int i = m_width - 1; i > 0; i--) {
-				std::swap(m_samples(i, j).x(), m_samples(i, random).x());
+			for (int i = width - 1; i > 0; i--) {
+				std::swap(samples(i, j).x(), samples(i, random).x());
 			}
 		}
-		for (int i = m_width - 1; i > 0; i--) {
+		for (int i = width - 1; i > 0; i--) {
 			random = genRand_int(0, i);
-			for (int j = m_height - 1; j > 0; j--) {
-				std::swap(m_samples(i, j).y(), m_samples(random, j).y());
+			for (int j = height - 1; j > 0; j--) {
+				std::swap(samples(i, j).y(), samples(random, j).y());
 			}
 		}
 	}
-
+	
 	Sampler2d m_samples;
 	int m_height, m_width;
 };
@@ -126,7 +138,7 @@ public:
 		for (int i = 0; i < total; i++) {
 			m_samples(i) = Vector2d((i + genRand_real(0, 1)) / (double) total, (i + genRand_real(0, 1)) / (double) total);
 		}
-		shuffle();
+		shuffle(m_samples);
 	}
 
 	Vector2d getSample(int x, int y) const {
@@ -145,8 +157,8 @@ public:
 	void genPoints() {
 		int total = m_height * m_width;
 		for (int i = 0; i < total; i++) {
-			double u = radicalInverse(i, 3);
-			double v = radicalInverse(i, 2);
+			double u = radicalInverse(i, 7);
+			double v = radicalInverse(i, 5);
 			m_samples(i) = Vector2d(u, v);
 		}
 	}
@@ -154,5 +166,41 @@ public:
 	Vector2d getSample(int x, int y) const {
 		return m_samples(x, y);
 	}
+
+};
+
+class PermutedHaltonSampler : public Sampler {
+public:
+	PermutedHaltonSampler(int w, int h) {
+		m_height = h, m_width = w;
+		m_samples.resize(w, h);
+		generatePermutation(m_permutationU, 7);
+		generatePermutation(m_permutationV, 5);
+	}
+
+	inline void generatePermutation(Eigen::Matrix<int, -1, -1>& permutation, int base) {
+		permutation.resize(base, 1);
+		for (int i = 0; i < base; i++) {
+			permutation(i) = i;
+		}
+		shuffle(permutation);
+	}
+
+	void genPoints() {
+		int total = m_height * m_width;
+		for (int i = 0; i < total; i++) {
+			double u = permutedRadicalInverse(i, 7, m_permutationU);
+			double v = permutedRadicalInverse(i, 5, m_permutationV);
+			m_samples(i) = Vector2d(u, v);
+		}
+	}
+
+	Vector2d getSample(int x, int y) const {
+		return m_samples(x, y);
+	}
+
+private:
+	Eigen::Matrix<int, -1, -1> m_permutationU, m_permutationV;
+	//static const int primes[];
 
 };

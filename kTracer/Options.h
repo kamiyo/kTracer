@@ -36,6 +36,10 @@ public:
 			Sampler* s = new HaltonSampler(m_samples, m_samples);
 			return s;
 		}
+		if (m_antialias == enums["permutedhalton"]) {
+			Sampler* s = new PermutedHaltonSampler(m_samples, m_samples);
+			return s;
+		}
 		return nullptr;
 	}
 
@@ -55,7 +59,7 @@ public:
 
 	std::map<std::string, int> enums = std::map<std::string, int>{
 		{ "off", 0 },
-		{ "center", 1 }, { "random", 2 }, { "jittered", 3 }, { "nrooks", 4 }, { "nrooks_correlated", 5 }, { "adaptive", 6 }, { "halton", 7 },
+		{ "center", 1 }, { "random", 2 }, { "jittered", 3 }, { "nrooks", 4 }, { "nrooks_correlated", 5 }, { "adaptive", 6 }, { "halton", 7 }, { "permutedhalton", 8 },
 		{ "hard", 1 }, { "soft", 2 },
 		{ "square", 1 }, { "circle", 2 },
 		{ "bvh", 1 },

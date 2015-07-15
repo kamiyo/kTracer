@@ -1,8 +1,8 @@
 --- #setup scene
 options:
     antialias:
-        type: halton
-        n: 16
+        type: permutedhalton
+        n: 4
     shadows:
         type: soft
         shape: circle
