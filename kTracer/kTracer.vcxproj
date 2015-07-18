@@ -118,6 +118,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <PreprocessorDefinitions>OPENEXR_DLL;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -146,6 +147,7 @@
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayBase.h" />
     <ClInclude Include="Sampler.h" />

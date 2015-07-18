@@ -23,6 +23,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		std::cerr << "Wrong number of arguments! usage:\nkTracer scene.yaml (out.exr)" << std::endl;
+		return 0;
 	}
 
 	Scene* scene = new Scene(inFile);

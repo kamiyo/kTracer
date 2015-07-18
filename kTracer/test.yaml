@@ -1,7 +1,7 @@
 --- #setup scene
 options:
     antialias:
-        type: permutedhalton
+        type: lowdiscrepancy
         n: 4
     shadows:
         type: soft
@@ -16,11 +16,11 @@ options:
 #setup camera
 camera:
     eye:    {x: 0.0, y: 0.0, z: 9.0}
-    dir:    {x: 0.0, y: 0.0, z: -4.0}
+    at:     {x: 0.0, y: 0.0, z: 0.7}
     up:     {x: 0.0, y: 1.0, z: 0.0}
-    image:  {w: 6.0, h: 4.5}
+    image:  {w: 12.0, h: 9.0}
     pixels: {w: 400, h: 300}
-    f-stop: 100
+    f-stop: 4.0
 
 materials:
 #setup materials

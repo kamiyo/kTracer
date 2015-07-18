@@ -12,17 +12,20 @@ public:
 		, m_dim(Vector2d(width, height))
 		, m_pixel_dim(Vector2i(pixelw, pixelh))
 	{
+		std::cout << m_dim << std::endl;
 		m_focal_distance = (focal == nINF) ? dir.norm() : focal;
+		std::cout << m_focal_distance << std::endl;
 		m_w = -m_dir;
 		m_u = (up.cross3(m_w)).normalized();
 		m_v = (m_w.cross3(m_u)).normalized();
 		m_uvw << m_u, m_v, m_w, Vector4d(0,0,0,1);
 		m_uvw.transposeInPlace();
 		m_lens_radius = (fstop == nINF) ? 0.0 : m_focal_distance / fstop;
+		std::cout << m_lens_radius << std::endl;
 	}
 	~Camera() {}
 
-	Ray generateRay(const double x, const double y) const;
+	Ray generateRay(Vector2d imageUV, Vector2d lensUV) const;
 	
 	Vector2i m_pixel_dim;
 

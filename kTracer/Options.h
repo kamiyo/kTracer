@@ -15,29 +15,37 @@ public:
 		m_antialias = enums[type];
 		m_samples = n;
 	}
-	Sampler* getAASampler() {
+	Sampler* getAASampler(Random* rng) {
 		if (m_antialias == enums["center"]) {
-			Sampler* s = new CenteredSampler(m_samples, m_samples);
+			Sampler* s = new CenteredSampler(m_samples, m_samples, rng);
 			return s;
 		}
 		if (m_antialias == enums["jittered"]) {
-			Sampler* s = new StratifiedSampler(m_samples, m_samples);
+			Sampler* s = new StratifiedSampler(m_samples, m_samples, rng);
 			return s;
 		}
 		if (m_antialias == enums["random"]) {
-			Sampler* s = new RandomSampler(m_samples, m_samples);
+			Sampler* s = new RandomSampler(m_samples, m_samples, rng);
 			return s;
 		}
 		if (m_antialias == enums["nrooks"]) {
-			Sampler* s = new NRooksSampler(m_samples, m_samples);
+			Sampler* s = new NRooksSampler(m_samples, m_samples, rng);
 			return s;
 		}
 		if (m_antialias == enums["halton"]) {
-			Sampler* s = new HaltonSampler(m_samples, m_samples);
+			Sampler* s = new HaltonSampler(m_samples, m_samples, rng);
 			return s;
 		}
 		if (m_antialias == enums["permutedhalton"]) {
-			Sampler* s = new PermutedHaltonSampler(m_samples, m_samples);
+			Sampler* s = new PermutedHaltonSampler(m_samples, m_samples, rng);
+			return s;
+		}
+		if (m_antialias == enums["lowdiscrepancy"]) {
+			Sampler* s = new LowDiscrepancySampler(m_samples, m_samples, rng);
+			return s;
+		}
+		if (m_antialias == enums["multijittered"]) {
+			Sampler* s = new MultiJitteredSampler(m_samples, m_samples, rng);
 			return s;
 		}
 		return nullptr;
@@ -59,7 +67,7 @@ public:
 
 	std::map<std::string, int> enums = std::map<std::string, int>{
 		{ "off", 0 },
-		{ "center", 1 }, { "random", 2 }, { "jittered", 3 }, { "nrooks", 4 }, { "nrooks_correlated", 5 }, { "adaptive", 6 }, { "halton", 7 }, { "permutedhalton", 8 },
+		{ "center", 1 }, { "random", 2 }, { "jittered", 3 }, { "nrooks", 4 }, { "multijittered", 5 }, { "adaptive", 6 }, { "halton", 7 }, { "permutedhalton", 8 }, { "lowdiscrepancy", 9 },
 		{ "hard", 1 }, { "soft", 2 },
 		{ "square", 1 }, { "circle", 2 },
 		{ "bvh", 1 },

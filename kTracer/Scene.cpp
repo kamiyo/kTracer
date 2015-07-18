@@ -16,15 +16,17 @@ void Scene::render(MatrixRgba& output) {
 
 #pragma omp parallel for schedule(dynamic)
 		for (int w = 0; w < width; ++w) {
-			Sampler* s = m_options->getAASampler();
+			Sampler* s = m_options->getAASampler(m_rng);
 			s->genPoints();
 			int number_samples = m_options->m_samples;
-			Sampler2d samples = s->getSamples();
+			const Sampler2d iSamples = s->getImageSamples();
+			const Sampler2d lSamples = s->getLensSamples();
 			Eigen::Matrix<Rgba, Eigen::Dynamic, 1> results(number_samples * number_samples);
-			
+			Vector2d px(w, h);
 			for (int m = 0; m < number_samples * number_samples; m++) {
-				Vector2d smn = samples(m);
-				Ray view = m_camera->generateRay((double) w + smn.x(), (double) h + smn.y());
+				const Vector2d iSample = iSamples(m);
+				const Vector2d lSample = lSamples(m);
+				Ray view = m_camera->generateRay(px + iSample, lSample - Vector2d::Constant(0.5));
 				trace(view, 0.0, INF, results(m));
 			}
 
