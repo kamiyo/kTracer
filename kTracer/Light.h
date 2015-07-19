@@ -5,8 +5,8 @@
 class Light
 {
 public:
-	virtual Vector4d getVector(Vector4d point) const = 0;
-	virtual double getFalloff(Vector4d point) const = 0;
+	virtual Vector4d getVector(const Vector4d& point) const = 0;
+	virtual double getFalloff(const Vector4d& point) const = 0;
 	Rgba i() const { return m_intensity; }
 	int type() const { return m_type; }
 	const static int POINT = 0, DIRECTIONAL = 1, SPOT = 2;

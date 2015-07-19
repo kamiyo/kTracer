@@ -22,6 +22,11 @@ public:
 		return m_lens;
 	}
 
+	void getSamples(const ArrayXi& oneD, const ArrayXi& twoD, Sampler1d& oneOut, Sampler2d& twoOut) {
+
+
+	}
+
 	template <typename T>
 	static inline void shuffle(Eigen::Matrix<T, -1, -1>& samples, Random* rng) {
 		int random;
@@ -58,13 +63,13 @@ public:
 		int height = (int)samples.rows(), width = (int)samples.cols();
 		for (int j = height - 1; j > 0; j--) {
 			random = rng->discrete(0, j);
-			for (int i = width - 1; i > 0; i--) {
+			for (int i = 0; i < width; i++) {
 				std::swap(samples(j, i).x(), samples(random, i).x());
 			}
 		}
 		for (int i = width - 1; i > 0; i--) {
 			random = rng->discrete(0, i);
-			for (int j = height - 1; j > 0; j--) {
+			for (int j = 0; j < height; j++) {
 				std::swap(samples(j, i).y(), samples(j, random).y());
 			}
 		}
@@ -87,8 +92,8 @@ public:
 	void genPoints() {
 		for (int i = 0; i < m_width; i++) {
 			for (int j = 0; j < m_height; j++) {
-				m_image(j, i) = Vector2d(i + m_rng->real(0, 1), j + m_rng->real(0, 1));
-				m_lens(j, i) = Vector2d(i + m_rng->real(0, 1), j + m_rng->real(0, 1));
+				m_image(j, i) << i + m_rng->real(0, 1), j + m_rng->real(0, 1);
+				m_lens(j, i) << i + m_rng->real(0, 1), j + m_rng->real(0, 1);
 			}
 		}
 	}
@@ -107,8 +112,8 @@ public:
 	void genPoints() {
 		for (int i = 0; i < m_width; i++) {
 			for (int j = 0; j < m_height; j++) {
-				m_image(j, i) = Vector2d((i + 0.5) / (double) m_width, (j + 0.5) / (double) m_height);
-				m_lens(j, i) = Vector2d((i + 0.5) / (double) m_width, (j + 0.5) / (double) m_height);
+				m_image(j, i) << (i + 0.5) / (double) m_width, (j + 0.5) / (double) m_height;
+				m_lens(j, i) << (i + 0.5) / (double) m_width, (j + 0.5) / (double) m_height;
 			}
 		}
 		shuffle(m_lens, m_rng);
@@ -127,8 +132,8 @@ public:
 	void genPoints() {
 		for (int i = 0; i < m_width; i++) {
 			for (int j = 0; j < m_height; j++) {
-				m_image(i, j) = Vector2d((i + m_rng->real(0, 1)) / (double) m_width, (j + m_rng->real(0, 1)) / (double) m_height);
-				m_lens(i, j) = Vector2d((i + m_rng->real(0, 1)) / (double) m_width, (j + m_rng->real(0, 1)) / (double) m_height);
+				m_image(j, i) = Vector2d((i + m_rng->real(0, 1)) / (double) m_width, (j + m_rng->real(0, 1)) / (double) m_height);
+				m_lens(j, i) = Vector2d((i + m_rng->real(0, 1)) / (double) m_width, (j + m_rng->real(0, 1)) / (double) m_height);
 			}
 		}
 		shuffle(m_lens, m_rng);
@@ -174,6 +179,7 @@ public:
 		}
 		shuffle_correlated(m_image, m_rng);
 		shuffle_correlated(m_lens, m_rng);
+		shuffle(m_lens, m_rng, true);
 	}
 
 };

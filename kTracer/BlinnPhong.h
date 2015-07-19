@@ -7,7 +7,7 @@ class BlinnPhong :
 	public Material
 {
 public:
-	BlinnPhong(std::string name, Rgba diffuse, Rgba specular, double power, bool normalized = false)
+	BlinnPhong(std::string name, const Rgba& diffuse, const Rgba& specular, double power, bool normalized = false)
 		: m_diffuse(diffuse)
 		, m_specular(specular)
 		, m_power(power)

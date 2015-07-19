@@ -6,7 +6,7 @@ class RayBase
 {
 public:
 	~RayBase() {}
-	RayBase(Vector4d eye, Vector4d dir, int type)
+	RayBase(const Vector4d& eye, const Vector4d& dir, int type)
 	: m_eye(eye)
 	, m_dir(dir)
 	, m_type(type)
@@ -24,8 +24,8 @@ public:
 	Vector4d i() const { return m_inv; }
 	Array4i s() const { return m_sign; }
 	
-	RayBase& e(Vector4d eye) { m_eye = eye; return *this; }
-	RayBase& d(Vector4d dir) { m_dir = dir;	init();	return *this; }
+	RayBase& e(const Vector4d& eye) { m_eye = eye; return *this; }
+	RayBase& d(const Vector4d& dir) { m_dir = dir;	init();	return *this; }
 
 	double epsilon() const { return m_epsilon; }
 	int type() const { return m_type; }

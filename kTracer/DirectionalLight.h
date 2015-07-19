@@ -4,7 +4,7 @@ class DirectionalLight :
 	public Light
 {
 public:
-	DirectionalLight(Vector4d direction, Rgba intensity, double r)
+	DirectionalLight(const Vector4d& direction, const Rgba& intensity, double r)
 		: m_direction(direction)
 		, m_radius(r)
 	{
@@ -13,11 +13,11 @@ public:
 	}
 	~DirectionalLight(){}
 
-	double getFalloff(Vector4d point) const {
+	double getFalloff(const Vector4d& point) const {
 		return 1.0;
 	}
 
-	Vector4d getVector(Vector4d point) const { return -m_direction; }
+	Vector4d getVector(const Vector4d& point) const { return -m_direction; }
 
 
 private:

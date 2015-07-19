@@ -2,7 +2,7 @@
 
 const double Triangle::M_EPSILON = 1e-6;
 
-Triangle::Triangle(Vector4d p1, Vector4d p2, Vector4d p3, Material* m)
+Triangle::Triangle(const Vector4d& p1, const Vector4d& p2, const Vector4d& p3, Material* m)
 	: m_p1(p1)
 	, m_p2(p2)
 	, m_p3(p3)

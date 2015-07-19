@@ -5,11 +5,11 @@ class AlignedBox :
 {
 public:
 	AlignedBox() { min() = INF4DPOINT, max() = nINF4DPOINT; }
-	AlignedBox(Vector4d point) {
+	AlignedBox(const Vector4d& point) {
 		min() = max() = point;
 		m_midpoint = (min() + max()) / 2.0;
 	}
-	AlignedBox(Vector4d newmin, Vector4d newmax) {
+	AlignedBox(const Vector4d& newmin, const Vector4d& newmax) {
 		min() = newmin, max() = newmax;
 		m_midpoint = (min() + max()) / 2.0;
 	}
@@ -40,7 +40,7 @@ public:
 		return *this;
 	}
 
-	inline AlignedBox merged(AlignedBox& other) {
+	inline AlignedBox merged(const AlignedBox& other) {
 		return AlignedBox(min().cwiseMin(other.min()), max().cwiseMax(other.max()));
 	}
 
@@ -48,10 +48,10 @@ public:
 
 	void transform(const Transform3d& t);
 
-	inline bool operator==(AlignedBox& rhs) {
+	inline bool operator==(const AlignedBox& rhs) {
 		return ((min().cwiseEqual(rhs.min()).all() && max().cwiseEqual(rhs.max()).all()));
 	}
-	inline bool operator!=(AlignedBox& rhs) {
+	inline bool operator!=(const AlignedBox& rhs) {
 		return ((min().cwiseNotEqual(rhs.min()).any() || max().cwiseNotEqual(rhs.max()).any()));
 	}
 

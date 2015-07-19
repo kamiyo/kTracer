@@ -55,6 +55,5 @@ private:
 	std::mt19937_64 mt;
 	std::uniform_real_distribution<double> uni_real;
 	std::normal_distribution<double> uni_gauss;
-	std::uniform_int_distribution<int> uni_int;
 };
 

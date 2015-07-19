@@ -4,7 +4,7 @@ class Plane :
 	public Surface
 {
 public:
-	Plane(Vector4d position, Vector4d normal, Material* material)
+	Plane(const Vector4d& position, const Vector4d& normal, Material* material)
 	: m_position(position)
 	, m_normal(normal.normalized())
 	, m_NP(-m_normal.dot(m_position))

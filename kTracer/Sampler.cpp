@@ -1,8 +1,10 @@
 #include "Sampler.h"
 
 std::ostream &operator<<(std::ostream &os, Sampler2d &s) {
-	for (int i = 0; i < s.size(); i++) {
-		os << s(i)[0] << " " << s(i)[1] << " " << std::endl;
+	for (int j = 0; j < s.rows(); j++) {
+		for (int i = 0; i < s.cols(); i++) {
+			os << s(j, i)[0] << " " << s(j, i)[1] << std::endl;
+		}
 	}
 	return os;
 }

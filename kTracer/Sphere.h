@@ -4,7 +4,7 @@ class Sphere :
 	public Surface
 {
 public:
-	Sphere(Vector4d position, double radius, Material* material)
+	Sphere(const Vector4d& position, double radius, Material* material)
 		: m_position(position)
 		, m_radius(radius)
 		, m_radius_2(radius * radius)

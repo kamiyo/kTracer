@@ -4,7 +4,7 @@ class Triangle :
 	public Surface
 {
 public:
-	Triangle(Vector4d p1, Vector4d p2, Vector4d p3, Material* m);
+	Triangle(const Vector4d& p1, const Vector4d& p2, const Vector4d& p3, Material* m);
 	
 	~Triangle() {}
 
