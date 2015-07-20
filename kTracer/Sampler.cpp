@@ -8,4 +8,5 @@ std::ostream &operator<<(std::ostream &os, Sampler2d &s) {
 	}
 	return os;
 }
-//const int PermutedHaltonSampler::primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
+
+const std::vector<int> PermutedHaltonSampler::primes = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };

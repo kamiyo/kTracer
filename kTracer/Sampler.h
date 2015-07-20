@@ -10,25 +10,39 @@ std::ostream &operator<<(std::ostream &os, Sampler2d &s);
 class Sampler
 {
 public:
-	Sampler(Random* rng) : m_rng(rng) {}
-	virtual void genPoints() {}
-	virtual const Sampler2d& getImageSamples() {
-		return m_image;
-	}
-	/*virtual const Sampler1d& getLightSamples() {
-		return m_light;
-	}*/
-	virtual const Sampler2d& getLensSamples() const {
-		return m_lens;
-	}
+	//virtual void genPoints() = 0;
+	virtual void genPoints(Sampler1d& samples) = 0;
+	virtual void genPoints(Sampler1d& samples, int size, int offset = 0) = 0;
+	virtual void genPoints(Sampler2d& samples) = 0;
+	virtual void genPoints(Sampler2d& samples, int size, int offset = 0) = 0;
 
-	void getSamples(const ArrayXi& oneD, const ArrayXi& twoD, Sampler1d& oneOut, Sampler2d& twoOut) {
-
-
+	void getIntegratorSamples(const ArrayXi& oneD, const ArrayXi& twoD, Sampler1d& oneOut, Sampler2d& twoOut) {
+		int oneDsize = oneD.sum();
+		int twoDsize = (twoD * twoD).sum();
+		oneOut.resize(oneDsize, 1);
+		twoOut.resize(twoDsize, 1);
+		int offset = 0;
+		for (int i = 0; i < (int) oneD.size(); i++) {
+			int nSamples = oneD(i);
+			genPoints(oneOut, offset, nSamples);
+			offset += nSamples;
+		}
+		if (offset != oneDsize) {
+			std::cerr << "something went wrong with the sampling" << std::endl;
+		}
+		offset = 0;
+		for (int i = 0; i < (int) twoD.size(); i++) {
+			int nSamples = twoD(i);
+			genPoints(twoOut, offset, nSamples);
+			offset += nSamples * nSamples;
+		}
+		if (offset != twoDsize) {
+			std::cerr << "something went wrong with the sampling" << std::endl;
+		}
 	}
 
 	template <typename T>
-	static inline void shuffle(Eigen::Matrix<T, -1, -1>& samples, Random* rng) {
+	static inline void shuffle(Eigen::Array<T, -1, -1>& samples, Random* rng) {
 		int random;
 		for (int i = (int) samples.size() - 1; i > 0; i--) {
 			random = rng->discrete(0, i);
@@ -75,68 +89,114 @@ public:
 		}
 	}
 	
-	Sampler2d m_image, m_lens;
 	Random* m_rng;
-	//Sampler1d m_light;
-	int m_height, m_width;
 };
 
 class RandomSampler : public Sampler {
 public:
-	RandomSampler(int w, int h, Random* rng) : Sampler(rng) {
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
+	RandomSampler(Random* rng) {
+		m_rng = rng;
 	}
 
-	void genPoints() {
-		for (int i = 0; i < m_width; i++) {
-			for (int j = 0; j < m_height; j++) {
-				m_image(j, i) << i + m_rng->real(0, 1), j + m_rng->real(0, 1);
-				m_lens(j, i) << i + m_rng->real(0, 1), j + m_rng->real(0, 1);
-			}
+	void genPoints(Sampler1d& samples) {
+		for (int i = 0; i < (int) samples.size(); i++) {
+			samples(i) = m_rng->real(0, 1);
 		}
 	}
 
+	void genPoints(Sampler2d& samples) {
+		for (int i = 0; i < (int) samples.size(); i++) {
+			samples(i) << m_rng->real(0, 1), m_rng->real(0, 1);
+		}
+	}
+
+	void genPoints(Sampler1d& samples, int offset, int size) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = m_rng->real(0, 1);
+		}
+	}
+
+	void genPoints(Sampler2d& samples, int offset, int size) {
+		for (int i = 0; i < size * size; i++) {
+			samples(offset + i) << m_rng->real(0, 1), m_rng->real(0, 1);
+		}
+	}
 
 };
 
 class CenteredSampler : public Sampler {
 public:
-	CenteredSampler(int w, int h, Random* rng) : Sampler(rng) {
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
+	CenteredSampler(Random* rng) {
+		m_rng = rng;
 	}
 
-	void genPoints() {
-		for (int i = 0; i < m_width; i++) {
-			for (int j = 0; j < m_height; j++) {
-				m_image(j, i) << (i + 0.5) / (double) m_width, (j + 0.5) / (double) m_height;
-				m_lens(j, i) << (i + 0.5) / (double) m_width, (j + 0.5) / (double) m_height;
+	void genPoints(Sampler1d& samples) {
+		int size = (int)samples.size();
+		for (int i = 0; i < size; i++) {
+			samples(i) = (i + 0.5) / size;
+		}
+	}
+
+	void genPoints(Sampler2d& samples) {
+		int height = (int) samples.rows(), width = (int) samples.cols();
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				samples(j, i) << (i + 0.5) / width, (j + 0.5) / height;
 			}
 		}
-		shuffle(m_lens, m_rng);
+	}
+	
+	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = (i + 0.5) / size;
+		}
 	}
 
+	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+		for (int j = 0; j < size; j++) {
+			for (int i = 0; i < size; i++) {
+				samples(offset + (j * size) + i) << (i + 0.5) / size, (j + 0.5) / size;
+			}
+		}
+	}
 };
 
 class StratifiedSampler : public Sampler {
 public:
-	StratifiedSampler(int w, int h, Random* rng) : Sampler(rng) {
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
+	StratifiedSampler(Random* rng) {
+		m_rng = rng;
 	}
 
-	void genPoints() {
-		for (int i = 0; i < m_width; i++) {
-			for (int j = 0; j < m_height; j++) {
-				m_image(j, i) = Vector2d((i + m_rng->real(0, 1)) / (double) m_width, (j + m_rng->real(0, 1)) / (double) m_height);
-				m_lens(j, i) = Vector2d((i + m_rng->real(0, 1)) / (double) m_width, (j + m_rng->real(0, 1)) / (double) m_height);
+	void genPoints(Sampler1d& samples) {
+		int size = (int) samples.size();
+		for (int i = 0; i < (int) samples.size(); i++) {
+			samples(i) = (i + m_rng->real(0, 1)) / (double) size;
+		}
+	}
+
+	void genPoints(Sampler2d& samples) {
+		int height = (int) samples.rows(), width = (int) samples.cols();
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				samples(j, i) << (i + m_rng->real(0, 1)) / (double) width
+							   , (j + m_rng->real(0, 1)) / (double) height;
 			}
 		}
-		shuffle(m_lens, m_rng);
+	}
+
+	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
+		}
+	}
+
+	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+		for (int j = 0; j < size; j++) {
+			for (int i = 0; i < size; i++) {
+				samples(offset + (j * size) + i) << (i + m_rng->real(0, 1)) / (double) size
+												  , (j + m_rng->real(0, 1)) / (double) size;
+			}
+		}
 	}
 
 };
@@ -144,67 +204,127 @@ public:
 
 class NRooksSampler : public Sampler {
 public:
-	NRooksSampler(int w, int h, Random* rng) : Sampler(rng) {
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
+	NRooksSampler(int w, int h, Random* rng) {
+		m_rng = rng;
 	}
 
-	void genPoints() {
-		int total = m_height * m_width;
-		for (int i = 0; i < total; i++) {
-			m_image(i) = Vector2d((i + m_rng->real(0, 1)) / (double) total, (i + m_rng->real(0, 1)) / (double) total);
-			m_lens (i) = Vector2d((i + m_rng->real(0, 1)) / (double) total, (i + m_rng->real(0, 1)) / (double) total);
+	void genPoints(Sampler1d& samples) {
+		int size = samples.size();
+		for (int i = 0; i < size; i++) {
+			samples(i) = (i + m_rng->real(0, 1)) / (double) size;
 		}
-		shuffle(m_image, m_rng);
-		shuffle(m_lens, m_rng);
+		shuffle(samples, m_rng);
+	}
+
+	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
+		}
+		shuffle(samples, m_rng);
+	}
+
+	void genPoints(Sampler2d& samples) {
+		int size = samples.size();
+		for (int i = 0; i < size; i++) {
+			samples(i) << (i + m_rng->real(0, 1)) / (double) size, (i + m_rng->real(0, 1)) / (double) size;
+		}
+		shuffle(samples, m_rng);
+	}
+
+	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+		int total = size * size;
+		for (int i = 0; i < total; i++) {
+			samples(offset + i) << (i + m_rng->real(0, 1)) / (double) total, (i + m_rng->real(0, 1)) / (double) total;
+		}
+		shuffle(samples, m_rng);
 	}
 
 };
 
 class MultiJitteredSampler : public Sampler {
 public:
-	MultiJitteredSampler(int w, int h, Random* rng) : Sampler(rng) {
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
+	MultiJitteredSampler(int w, int h, Random* rng) {
+		m_rng = rng;
 	}
 
-	void genPoints() {
-		for (int j = 0; j < m_height; j++) {
-			for (int i = 0; i < m_width; i++) {
-				m_image(j, i) = Vector2d((i + (j + m_rng->real(0, 1)) / (double) m_height) / (double) m_width, (j + (i + m_rng->real(0, 1)) / (double) m_width) / (double) m_height);
-				m_lens(j, i) = Vector2d((i + (j + m_rng->real(0, 1)) / (double) m_height) / (double) m_width, (j + (i + m_rng->real(0, 1)) / (double) m_width) / (double) m_height);
+	void genPoints(Sampler1d& samples) {
+		int size = (int) samples.size();
+		for (int i = 0; i < size; i++) {
+			samples(i) = (i + m_rng->real(0, 1)) / (double) size;
+		}
+		shuffle(samples, m_rng);
+	}
+
+	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
+		}
+		shuffle(samples, m_rng);
+	}
+
+	void genPoints(Sampler2d& samples) {
+		int height = (int) samples.rows(), width = (int) samples.cols();
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				samples(j, i) << (i + (j + m_rng->real(0, 1)) / (double) height) / (double) width
+							   , (j + (i + m_rng->real(0, 1)) / (double) width) / (double) height;
 			}
 		}
-		shuffle_correlated(m_image, m_rng);
-		shuffle_correlated(m_lens, m_rng);
-		shuffle(m_lens, m_rng, true);
+		shuffle_correlated(samples, m_rng);
+	}
+
+	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+		int height = size, width = size;
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				samples(offset + (j * width) + height) << (i + (j + m_rng->real(0, 1)) / (double) height) / (double) width
+														, (j + (i + m_rng->real(0, 1)) / (double) width) / (double) height;
+			}
+		}
+		shuffle_correlated(samples, m_rng);
 	}
 
 };
 
 class HaltonSampler : public Sampler {
 public:
-	HaltonSampler(int w, int h, Random* rng) : Sampler(rng) {
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
+	HaltonSampler(int w, int h, Random* rng) {
+		m_rng = rng;
 	}
 
-	void genPoints() {
-		int total = m_height * m_width;
+	void genPoints(Sampler2d& samples) {
+		int total = (int) samples.size();
 		for (int i = 0; i < total; i++) {
 			double u = radicalInverse(i, 7);
 			double v = radicalInverse(i, 5);
-			m_image(i) = Vector2d(u, v);
-			u = radicalInverse(i, 11);
-			v = radicalInverse(i, 13);
-			m_lens(i) = Vector2d(u, v);
+			samples(i) = Vector2d(u, v);
 		}
 	}
 
-	inline double radicalInverse(int n, int base) {
+	void genPoints(Sampler1d& samples) {
+		int total = (int) samples.size();
+		for (int i = 0; i < total; i++) {
+			samples(i) = radicalInverse(i, 7);
+		}
+	}
+
+	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+		int total = size * size;
+		for (int i = 0; i < total; i++) {
+			double u = radicalInverse(i, 7);
+			double v = radicalInverse(i, 5);
+			samples(offset + i) = Vector2d(u, v);
+		}
+	}
+
+	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+		int total = size;
+		for (int i = 0; i < total; i++) {
+			samples(offset + i) = radicalInverse(i, 7);
+		}
+	}
+
+	static inline double radicalInverse(int n, int base) {
 		double result = 0;
 		double invBase = 1.0 / base, invBaseIncrement = invBase;
 		while (n > 0) {
@@ -215,12 +335,12 @@ public:
 		}
 		return result;
 	}
-
 };
 
 class PermutedHaltonSampler : public Sampler {
 public:
-	PermutedHaltonSampler(int w, int h, Random* rng) : Sampler(rng) {
+	PermutedHaltonSampler(int w, int h, Random* rng) {
+		m_rng = rng;
 		m_height = h, m_width = w;
 		m_image.resize(h, w);
 		m_lens.resize(h, w);
@@ -266,12 +386,14 @@ public:
 private:
 	Eigen::Matrix<int, -1, -1> m_permImageU, m_permImageV, m_permLensU, m_permLensV;
 	//static const int primes[];
+	static const std::vector<int> primes;
 
 };
 
 class LowDiscrepancySampler : public Sampler {
 public:
-	LowDiscrepancySampler(int w, int h, Random* rng) : Sampler(rng) {
+	LowDiscrepancySampler(int w, int h, Random* rng) {
+		m_rng = rng;
 		m_height = h, m_width = w;
 		m_image.resize(h, w);
 		m_lens.resize(h, w);
