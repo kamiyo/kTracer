@@ -32,4 +32,6 @@ public:
 
 	//bool m_isTransformed;
 	int m_type;
+	int m_ID;
+	static int counter;
 };

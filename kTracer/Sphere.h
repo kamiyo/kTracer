@@ -13,6 +13,7 @@ public:
 		m_type = Surface::SPHERE;
 		Vector4d r(radius, radius, radius, 0);
 		m_boundingBox = AlignedBox(position - r, position + r);
+		m_ID = counter++;
 	}
 	~Sphere() {}
 

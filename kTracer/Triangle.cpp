@@ -18,6 +18,7 @@ Triangle::Triangle(const Vector4d& p1, const Vector4d& p2, const Vector4d& p3, M
 
 	m_boundingBox = AlignedBox(p1);
 	m_boundingBox.extend(p2).extend(p3);
+	m_ID = counter++;
 }
 
 bool Triangle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {

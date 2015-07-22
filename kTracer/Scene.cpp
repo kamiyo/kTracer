@@ -33,7 +33,7 @@ void Scene::render(MatrixRgba& output) {
 				Ray view = m_camera->generateRay(px + iSample, lSample - Vector2d::Constant(0.5));
 				trace(view, 0.0, INF, results(m));
 			}
-
+			// if (needsSuperSample)
 			Rgba result = Rgba::Zero();
 			for (int i = 0; i < (int) results.size(); i++) {
 				result += results(i);

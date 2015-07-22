@@ -13,6 +13,7 @@ public:
 		m_normal.normalize();
 		m_type = Surface::PLANE;
 		m_boundingBox = AlignedBox::Infinite();
+		m_ID = counter++;
 	}
 	~Plane() {}
 
