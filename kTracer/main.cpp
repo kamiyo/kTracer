@@ -31,12 +31,9 @@ int main(int argc, char** argv) {
 		}
 		std::cout << accumulate / 1000 << std::endl;*/
 		
-		Sampler* s = new MultiJitteredSampler(4, 4, rng);
-		s->genPoints();
-		Sampler2d i = s->getImageSamples();
+		Sampler* s = new PermutedHaltonSampler(rng);
+		Sampler2d i; i.resize(4, 4); s->genPoints(i);
 		std::cout << i << std::endl;
-		Sampler2d l = s->getLensSamples();
-		std::cout << l << std::endl;
 		return 0;
 	}
 

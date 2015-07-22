@@ -10,17 +10,21 @@ void Scene::render(MatrixRgba& output) {
 	output.resize(height, width);
 	clock_t start = clock();
 	Vector2i pixels = m_camera->m_pixel_dim;
+	Sampler* s = m_options->getAASampler(m_rng);
+	int number_samples = m_options->m_samples;
+	Sampler2d iSamples, lSamples;
+	iSamples.resize(number_samples, number_samples);
+	lSamples.resize(number_samples, number_samples);
 	for (int h = 0; h < height; ++h) {
 		clock_t inner_start = clock();
 		int startray = Ray::count;
 
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for schedule(dynamic) firstprivate(s, iSamples, lSamples)
 		for (int w = 0; w < width; ++w) {
-			Sampler* s = m_options->getAASampler(m_rng);
-			s->genPoints();
-			int number_samples = m_options->m_samples;
-			const Sampler2d iSamples = s->getImageSamples();
-			const Sampler2d lSamples = s->getLensSamples();
+			
+			s->genPoints(iSamples);
+			s->genPoints(lSamples);
+			s->shuffle(lSamples);
 			Eigen::Matrix<Rgba, Eigen::Dynamic, 1> results(number_samples * number_samples);
 			Vector2d px(w, h);
 			for (int m = 0; m < number_samples * number_samples; m++) {

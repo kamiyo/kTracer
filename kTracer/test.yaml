@@ -1,7 +1,7 @@
 --- #setup scene
 options:
     antialias:
-        type: multijittered
+        type: permutedhalton
         n: 4
     shadows:
         type: soft

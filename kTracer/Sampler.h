@@ -41,6 +41,27 @@ public:
 		}
 	}
 
+	void shuffle(Sampler2d& samples, bool together = false) {
+		if (together) {
+			int random;
+			for (int i = (int) samples.size() - 1; i > 0; i--) {
+				random = m_rng->discrete(0, i);
+				std::swap(samples(i), samples(random));
+			}
+			return;
+		}
+		else {
+			int randomx, randomy;
+			for (int i = (int) samples.size() - 1; i > 0; i--) {
+				randomx = m_rng->discrete(0, i);
+				randomy = m_rng->discrete(0, i);
+				std::swap(samples(i).x(), samples(randomx).x());
+				std::swap(samples(i).y(), samples(randomy).y());
+			}
+			return;
+		}
+	}
+
 	template <typename T>
 	static inline void shuffle(Eigen::Array<T, -1, -1>& samples, Random* rng) {
 		int random;
@@ -204,12 +225,12 @@ public:
 
 class NRooksSampler : public Sampler {
 public:
-	NRooksSampler(int w, int h, Random* rng) {
+	NRooksSampler(Random* rng) {
 		m_rng = rng;
 	}
 
 	void genPoints(Sampler1d& samples) {
-		int size = samples.size();
+		int size = (int) samples.size();
 		for (int i = 0; i < size; i++) {
 			samples(i) = (i + m_rng->real(0, 1)) / (double) size;
 		}
@@ -224,7 +245,7 @@ public:
 	}
 
 	void genPoints(Sampler2d& samples) {
-		int size = samples.size();
+		int size = (int) samples.size();
 		for (int i = 0; i < size; i++) {
 			samples(i) << (i + m_rng->real(0, 1)) / (double) size, (i + m_rng->real(0, 1)) / (double) size;
 		}
@@ -243,7 +264,7 @@ public:
 
 class MultiJitteredSampler : public Sampler {
 public:
-	MultiJitteredSampler(int w, int h, Random* rng) {
+	MultiJitteredSampler(Random* rng) {
 		m_rng = rng;
 	}
 
@@ -288,15 +309,15 @@ public:
 
 class HaltonSampler : public Sampler {
 public:
-	HaltonSampler(int w, int h, Random* rng) {
+	HaltonSampler(Random* rng) : m_current_prime(0) {
 		m_rng = rng;
 	}
 
 	void genPoints(Sampler2d& samples) {
 		int total = (int) samples.size();
 		for (int i = 0; i < total; i++) {
-			double u = radicalInverse(i, 7);
-			double v = radicalInverse(i, 5);
+			double u = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
+			double v = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
 			samples(i) = Vector2d(u, v);
 		}
 	}
@@ -304,15 +325,15 @@ public:
 	void genPoints(Sampler1d& samples) {
 		int total = (int) samples.size();
 		for (int i = 0; i < total; i++) {
-			samples(i) = radicalInverse(i, 7);
+			samples(i) = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
 		}
 	}
 
 	void genPoints(Sampler2d& samples, int size, int offset = 0) {
 		int total = size * size;
 		for (int i = 0; i < total; i++) {
-			double u = radicalInverse(i, 7);
-			double v = radicalInverse(i, 5);
+			double u = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
+			double v = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
 			samples(offset + i) = Vector2d(u, v);
 		}
 	}
@@ -320,7 +341,7 @@ public:
 	void genPoints(Sampler1d& samples, int size, int offset = 0) {
 		int total = size;
 		for (int i = 0; i < total; i++) {
-			samples(offset + i) = radicalInverse(i, 7);
+			samples(offset + i) = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
 		}
 	}
 
@@ -335,22 +356,29 @@ public:
 		}
 		return result;
 	}
+
+private:
+	static const std::vector<int> primes;
+	int m_current_prime;
 };
 
 class PermutedHaltonSampler : public Sampler {
 public:
-	PermutedHaltonSampler(int w, int h, Random* rng) {
+	PermutedHaltonSampler(Random* rng) : m_current_prime(0) {
 		m_rng = rng;
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
-		generatePermutation(m_permImageU, 5, rng);
-		generatePermutation(m_permImageV, 7, rng);
-		generatePermutation(m_permLensU, 11, rng);
-		generatePermutation(m_permLensV, 13, rng);
+		for (int i = 0; i < 2; i++) {
+			generatePermutation(m_permutations[i], primes[i], m_rng);
+		}
 	}
 
-	inline void generatePermutation(Eigen::Matrix<int, -1, -1>& permutation, int base, Random* rng) {
+	PermutedHaltonSampler(int dim, Random* rng) : m_current_prime(0), m_dims(dim) {
+		m_rng = rng;
+		for (int i = 0; i < m_dims; i++) {
+			generatePermutation(m_permutations[i], primes[i], m_rng);
+		}
+	}
+
+	inline void generatePermutation(Eigen::Array<int, -1, -1>& permutation, int base, Random* rng) {
 		permutation.resize(base, 1);
 		for (int i = 0; i < base; i++) {
 			permutation(i) = i;
@@ -358,20 +386,49 @@ public:
 		shuffle(permutation, rng);
 	}
 
-	void genPoints() {
-		
-		int total = m_height * m_width;
+	void genPoints(Sampler2d& samples) {
+		int total = (int)samples.size();
 		for (int i = 0; i < total; i++) {
-			double u = permutedRadicalInverse(i, 7, m_permImageU);
-			double v = permutedRadicalInverse(i, 5, m_permImageV);
-			m_image(i) << u, v;
-			u = permutedRadicalInverse(i, 11, m_permLensU);
-			v = permutedRadicalInverse(i, 13, m_permLensV);
-			m_lens(i) << u, v;
+			double u = permutedRadicalInverse(i, primes[0], m_permutations[0]);
+			double v = permutedRadicalInverse(i, primes[1], m_permutations[1]);
+			samples(i) << u, v;
 		}
 	}
 
-	inline double permutedRadicalInverse(int n, int base, Eigen::Matrix<int, -1, -1>& permutation) {
+	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+		int total = size * size;
+		for (int i = 0; i < total; i++) {
+			double u = permutedRadicalInverse(i, primes[0], m_permutations[0]);
+			double v = permutedRadicalInverse(i, primes[1], m_permutations[1]);
+			samples(offset + i) << u, v;
+		}
+	}
+
+	void genPoints(Sampler1d& samples) {
+		int total = (int) samples.size();
+		for (int i = 0; i < total; i++) {
+			double u = permutedRadicalInverse(i, primes[0], m_permutations[0]);
+			samples(i) = u;
+		}
+	}
+
+	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = permutedRadicalInverse(i, primes[0], m_permutations[0]);
+		}
+	}
+
+	void genDimPoints(Sampler1d& samples, int sample) {
+		int total = (int) samples.size();
+		for (int i = 0; i < m_dims; i++) {
+			if (m_permutations[i].size() == 0) {
+				generatePermutation(m_permutations[i], primes[i], m_rng);
+			}
+			samples(i) = permutedRadicalInverse(sample, primes[i], m_permutations[i]);
+		}
+	}
+
+	inline double permutedRadicalInverse(int n, int base, Eigen::Array<int, -1, -1>& permutation) {
 		double result = 0;
 		double invBase = 1.0 / base, invBaseIncrement = invBase;
 		while (n > 0) {
@@ -384,35 +441,53 @@ public:
 	}
 
 private:
-	Eigen::Matrix<int, -1, -1> m_permImageU, m_permImageV, m_permLensU, m_permLensV;
-	//static const int primes[];
+	Eigen::Array<int, -1, -1> m_permutations[100];
 	static const std::vector<int> primes;
+	int m_current_prime;
+	int m_dims;
+
 
 };
 
 class LowDiscrepancySampler : public Sampler {
 public:
-	LowDiscrepancySampler(int w, int h, Random* rng) {
+	LowDiscrepancySampler(Random* rng) {
 		m_rng = rng;
-		m_height = h, m_width = w;
-		m_image.resize(h, w);
-		m_lens.resize(h, w);
 	}
 
-	void genPoints() {
-		LDShuffle(m_image, m_rng);
-		LDShuffle(m_lens, m_rng);
-	}
-
-private:
-	static inline void LDShuffle(Sampler2d& samples, Random* rng) {
-		Vector2ui scramble(rng->udiscrete(), rng->udiscrete());
+	void genPoints(Sampler2d& samples) {
+		Vector2ui scramble(m_rng->udiscrete(), m_rng->udiscrete());
 		for (unsigned int i = 0; i < (unsigned int) samples.size(); i++) {
 			Sample02(i, scramble, samples(i));
 		}
-		shuffle(samples, rng);
+		shuffle(samples, m_rng);
 	}
 
+	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+		Vector2ui scramble(m_rng->udiscrete(), m_rng->udiscrete());
+		for (unsigned int i = 0; i < (unsigned int) size; i++) {
+			Sample02(i, scramble, samples(offset + i));
+		}
+		shuffle(samples, m_rng);
+	}
+
+	void genPoints(Sampler1d& samples) {
+		unsigned int scramble = m_rng->udiscrete();
+		for (unsigned int i = 0; i < (unsigned int) samples.size(); i++) {
+			samples(i) = VanDerCorput(i, scramble);
+		}
+		shuffle(samples, m_rng);
+	}
+
+	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+		unsigned int scramble = m_rng->udiscrete();
+		for (unsigned int i = 0; i < (unsigned int) size; i++) {
+			samples(offset + i) = VanDerCorput(i, scramble);
+		}
+		shuffle(samples, m_rng);
+	}
+
+private:
 	static inline void Sample02(unsigned int n, const Vector2ui& scramble, Vector2d& sample) {
 		sample.x() = VanDerCorput(n, scramble[0]);
 		sample.y() = Sobol2(n, scramble[1]);

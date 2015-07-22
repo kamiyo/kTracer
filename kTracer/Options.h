@@ -17,35 +17,35 @@ public:
 	}
 	Sampler* getAASampler(Random* rng) {
 		if (m_antialias == enums["center"]) {
-			Sampler* s = new CenteredSampler(m_samples, m_samples, rng);
+			Sampler* s = new CenteredSampler(rng);
 			return s;
 		}
 		if (m_antialias == enums["jittered"]) {
-			Sampler* s = new StratifiedSampler(m_samples, m_samples, rng);
+			Sampler* s = new StratifiedSampler(rng);
 			return s;
 		}
 		if (m_antialias == enums["random"]) {
-			Sampler* s = new RandomSampler(m_samples, m_samples, rng);
+			Sampler* s = new RandomSampler(rng);
 			return s;
 		}
 		if (m_antialias == enums["nrooks"]) {
-			Sampler* s = new NRooksSampler(m_samples, m_samples, rng);
+			Sampler* s = new NRooksSampler(rng);
 			return s;
 		}
 		if (m_antialias == enums["halton"]) {
-			Sampler* s = new HaltonSampler(m_samples, m_samples, rng);
+			Sampler* s = new HaltonSampler(rng);
 			return s;
 		}
 		if (m_antialias == enums["permutedhalton"]) {
-			Sampler* s = new PermutedHaltonSampler(m_samples, m_samples, rng);
+			Sampler* s = new PermutedHaltonSampler(rng);
 			return s;
 		}
 		if (m_antialias == enums["lowdiscrepancy"]) {
-			Sampler* s = new LowDiscrepancySampler(m_samples, m_samples, rng);
+			Sampler* s = new LowDiscrepancySampler(rng);
 			return s;
 		}
 		if (m_antialias == enums["multijittered"]) {
-			Sampler* s = new MultiJitteredSampler(m_samples, m_samples, rng);
+			Sampler* s = new MultiJitteredSampler(rng);
 			return s;
 		}
 		return nullptr;
