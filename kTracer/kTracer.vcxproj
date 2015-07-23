@@ -132,8 +132,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AlignedBox.h" />
+    <ClInclude Include="AreaLight.h" />
     <ClInclude Include="BlinnPhong.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Circle.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Group.h" />
     <ClInclude Include="Hilbert.h" />
@@ -160,8 +162,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AlignedBox.cpp" />
+    <ClCompile Include="AreaLight.cpp" />
     <ClCompile Include="BlinnPhong.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Circle.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Group.cpp" />
     <ClCompile Include="Hilbert.cpp" />

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Material.h"
+class Surface;
 
 class HitRecord
 {
@@ -9,6 +10,6 @@ public:
 	~HitRecord() {}
 	double t;
 	Vector4d normal;
-	Material* material;
+	const Surface* surface;
 };
 

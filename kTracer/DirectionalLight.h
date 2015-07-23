@@ -13,9 +13,9 @@ public:
 	}
 	~DirectionalLight(){}
 
-	double getFalloff(const Vector4d& point) const {
+	/*double getFalloff(const Vector4d& point) const {
 		return 1.0;
-	}
+	}*/
 
 	Vector4d getVector(const Vector4d& point) const { return -m_direction; }
 

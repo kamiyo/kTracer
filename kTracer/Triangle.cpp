@@ -37,6 +37,6 @@ bool Triangle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const 
 	record.t = t;
 	if (ray.type() == RayBase::SHADOW) { return true; }
 	record.normal = m_normal;
-	record.material = m_material;
+	record.surface = this;
 	return true;
 }

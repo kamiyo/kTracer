@@ -16,6 +16,8 @@
 #define M_1_PI 0.31830988618379067154 // 1/pi
 #define INF4DPOINT Vector4d(INF, INF, INF, 1)
 #define nINF4DPOINT Vector4d(nINF, nINF, nINF, 1)
+#define INF4DDIR Vector4d(INF, INF, INF, 0)
+#define nINF4DDIR Vector4d(nINF, nINF, nINF, 0)
 
 typedef Eigen::Vector2d Vector2d;
 typedef Eigen::Vector2i Vector2i;

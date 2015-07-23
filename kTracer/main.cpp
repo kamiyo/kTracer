@@ -23,17 +23,16 @@ int main(int argc, char** argv) {
 	}
 	else {
 		std::cerr << "Wrong number of arguments! usage:\nkTracer scene.yaml (out.exr)" << std::endl;
-		Random* rng = new Random();
-		/*
-		double accumulate = 0;
-		for (int i = 0; i < 1000; i++) {
-			accumulate += rng->discrete(0, 16);
+		Random* rn = new Random();
+		Sampler* s = new LowDiscrepancySampler(rn);
+		Sampler2d smp(16, 16);
+		s->genPoints(smp);
+		for (int i = 0; i < (int) smp.size(); i++) {
+			Vector2d out;
+			to_unit_disk(smp(i).x(), smp(i).y(), out);
+			std::cout << out.transpose() << std::endl;
+			//std::cout << smp(i).transpose() << std::endl;
 		}
-		std::cout << accumulate / 1000 << std::endl;*/
-		
-		Sampler* s = new PermutedHaltonSampler(rng);
-		Sampler2d i; i.resize(4, 4); s->genPoints(i);
-		std::cout << i << std::endl;
 		return 0;
 	}
 

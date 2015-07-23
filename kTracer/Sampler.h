@@ -457,10 +457,11 @@ public:
 
 	void genPoints(Sampler2d& samples) {
 		Vector2ui scramble(m_rng->udiscrete(), m_rng->udiscrete());
+		std::cerr << scramble.transpose() << std::endl;
 		for (unsigned int i = 0; i < (unsigned int) samples.size(); i++) {
 			Sample02(i, scramble, samples(i));
 		}
-		shuffle(samples, m_rng);
+		shuffle(samples, m_rng, true);
 	}
 
 	void genPoints(Sampler2d& samples, int size, int offset = 0) {
@@ -468,7 +469,7 @@ public:
 		for (unsigned int i = 0; i < (unsigned int) size; i++) {
 			Sample02(i, scramble, samples(offset + i));
 		}
-		shuffle(samples, m_rng);
+		shuffle(samples, m_rng, true);
 	}
 
 	void genPoints(Sampler1d& samples) {
@@ -500,13 +501,13 @@ private:
 		n = ((n & 0x33333333) << 2) | ((n & 0xcccccccc) >> 2);
 		n = ((n & 0x55555555) << 1) | ((n & 0xaaaaaaaa) >> 1);
 		n ^= scramble;
-		return ((n >> 8) & 0xffffff) / double(1 << 24);
+		return (n & 0xffffffff) / double(1ULL << 32);
 	}
 
 	static inline double Sobol2(unsigned int n, unsigned int scramble) {
 		for (unsigned int v = 1 << 31; n != 0; n >>= 1, v ^= v >> 1) {
 			if (n & 0x1) scramble ^= v;
 		}
-		return ((scramble >> 8) & 0xffffff) / double(1 << 24);
+		return (scramble & 0xffffffff) / double(1ULL << 32);
 	}
 };

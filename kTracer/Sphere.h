@@ -17,6 +17,8 @@ public:
 	}
 	~Sphere() {}
 
+	double area() const { return 4.0 * M_PI * m_radius_2; }
+
 	bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const;
 private:
 	Vector4d m_position;

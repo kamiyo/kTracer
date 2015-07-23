@@ -64,13 +64,14 @@ void Scene::trace(Ray& ray, double t0, double t1, Rgba& out) const {
 	out = Rgba::Zero();
 	if (m_objects->hit(ray, t0, t1, record)) {
 		const Vector4d xpoint = ray(record.t);
-		std::string name = record.material->m_name;
+		const Material* m = record.surface->m_material;
+		std::string name = m->m_name;
 		for (Light* l : m_lights) {
 			const Vector4d light = l->getVector(xpoint);
 			Ray shadowRay(xpoint, light, RayBase::SHADOW);
 			HitRecord shadowRecord;
 			if (!m_objects->hit(shadowRay, shadowRay.epsilon(), 1.0, shadowRecord)) {
-				out += record.material->brdf(-ray.d().normalized(), light.normalized(), record.normal, l->i());
+				out += m->brdf(-ray.d().normalized(), light.normalized(), record.normal, l->i());
 			}
 		}
 	}
