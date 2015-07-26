@@ -7,6 +7,12 @@ class AreaLight :
 {
 public:
 	AreaLight() {}
+	AreaLight(const Rgba& intensity, const Vector4d& atten) {
+		m_intensity = intensity;
+		m_attenuation = atten;
+		m_type = AREA;
+	}
+
 	AreaLight(const Surface* surface, const Rgba& intensity, const Vector4d& atten) : m_surface(surface) {
 		m_intensity = intensity;
 		m_attenuation = atten;
@@ -15,6 +21,12 @@ public:
 		m_power = m_intensity * m_area * M_PI;
 	}
 	~AreaLight() {}
+
+	void setSurface(const Surface* surface) {
+		m_surface = surface;
+		m_area = m_surface->area();
+		m_power = m_intensity * m_area * M_PI;
+	}
 
 	/*double getFalloff(const Vector4d& point) const {
 		double norm = (point - m_position).norm();

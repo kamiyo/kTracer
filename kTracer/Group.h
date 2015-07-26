@@ -14,6 +14,10 @@ public:
 		return (Group*)this;
 	}
 
+	Surface* back() {
+		return m_objects.back();
+	}
+
 	std::vector<Surface *> m_objects;
 };
 

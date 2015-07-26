@@ -5,6 +5,7 @@
 #include "AlignedBox.h"
 #include "HitRecord.h"
 #include "RayBase.h"
+#include "AreaLight.h"
 
 class Surface : public Intersectable
 {
@@ -27,6 +28,7 @@ public:
 
 	enum { PLANE, SPHERE, CYLINDER, CONE, TORUS, TRIANGLE, FACE, CIRCLE, BOX, BOVOH, INSTANCE };
 	Material* m_material;
+	AreaLight* m_light;
 
 	//Matrix4d m_inverse;
 	//Matrix4d m_transpose;

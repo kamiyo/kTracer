@@ -101,6 +101,10 @@ void Parser::loadLights(std::vector<Light*>& lightVec) const {
 				lightVec.push_back(new DirectionalLight(direction, intensity, size));
 				continue;
 			}
+			if (type == "area") {
+				lightVec.push_back(new AreaLight(intensity, attenuation));
+				continue;
+			}
 		}
 
 	}
@@ -153,7 +157,7 @@ void Parser::loadMaterials(std::unordered_map<std::string, Material *>& matVec) 
 }
 
 // still need to add transform parsing, and a bunch of other objects!
-Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec) const {
+Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec, std::vector<Light*>& lightVec) const {
 	try {
 		for (auto things : mVec) {
 			std::cout << things.first << std::endl;
@@ -163,15 +167,27 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 		std::stack<Transform3d> transform, inverse;
 		YAML::Node scene = m_scene["scene"];
 		for (YAML::Node s : scene) {
+			Material* material = nullptr;
+			AreaLight* alight = nullptr;
 			std::string matName = s["material"].as<std::string>();
-			auto m = mVec.find(matName);
-			Material* material;
-			if (m != mVec.end()) {
-				material = m->second;
+			int lightNum = -1;
+			if (matName == "light") {
+				lightNum = s["light"].as<int>();
+				if (lightVec[lightNum]->type == Light::AREA) {
+					alight = (AreaLight*) lightVec[lightNum];
+				}
+				else {
+					std::cerr << "Light " << lightNum << " is not an area light!" << std::endl;
+				}
 			}
 			else {
-				throw std::exception("material not found!");
-				material = nullptr;
+				auto m = mVec.find(matName);
+				if (m != mVec.end()) {
+					material = m->second;
+				}
+				else {
+					throw std::exception("material not found!");
+				}
 			}
 			std::string type = s["type"].as<std::string>();
 			if (type == "plane") {
@@ -186,6 +202,7 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 				Vector4d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1);
 				double radius = s["radius"].as<double>();
 				objVec->push_back(new Sphere(position, radius, material));
+				if (alight) ((AreaLight*) lightVec[lightNum])->setSurface(objVec->back());
 				continue;
 			}
 			if (type == "triangle") {
@@ -197,6 +214,7 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec)
 					, vert2(v2["x"].as<double>(), v2["y"].as<double>(), v2["z"].as<double>(), 1)
 					, vert3(v3["x"].as<double>(), v3["y"].as<double>(), v3["z"].as<double>(), 1);
 				objVec->push_back(new Triangle(vert1, vert2, vert3, material));
+				if (alight) ((AreaLight*) lightVec[lightNum])->setSurface(objVec->back());
 				continue;
 			}
 		}

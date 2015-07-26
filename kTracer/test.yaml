@@ -49,11 +49,9 @@ materials:
 
 #setup lights
 lights:
-    - type: point
-      position: {x: 0.0, y: 4.7, z: 0.0}
+    - type: area
       intensity: {r: 1, g: 1, b: 1}
-      size: 0.05
-      attenuation: {constant: 1.0, squared: 0.0, linear: 0.0}
+      attenuation: {constant: 0.0, squared: 1.0, linear: 0.0}
 
 #scene
 scene:
@@ -73,6 +71,11 @@ scene:
       position: {x: 0.0, y: 5.0,  z: 0.0}
       normal:   {x: 0.0, y: -1.0, z: 0.0}
       material: grey
+    - type: circle #light
+      position: {x: 0.0, y: 4.99, z: 0.0}
+      normal:   {x: 0.0, y: -1.0, z: 0.0}
+      material: light
+      light: 0
     - type: plane #back
       position: {x: 0.0, y: 0.0, z: -5.0}
       normal:   {x: 0.0, y: 0.0, z: 1.0}
