@@ -2,7 +2,7 @@
 
 const double Triangle::M_EPSILON = 1e-6;
 
-Triangle::Triangle(const Vector4d& p1, const Vector4d& p2, const Vector4d& p3, Material* m)
+Triangle::Triangle(const Vector4d& p1, const Vector4d& p2, const Vector4d& p3, Material* m, AreaLight* l)
 	: m_p1(p1)
 	, m_p2(p2)
 	, m_p3(p3)
@@ -11,6 +11,7 @@ Triangle::Triangle(const Vector4d& p1, const Vector4d& p2, const Vector4d& p3, M
 	, m_normal((p2 - p1).cross3(p3 - p1).normalized())
 {
 	m_material = m;
+	m_light = l;
 	m_type = Surface::TRIANGLE;
 	m_matrix.resize(4, 3);
 	m_matrix << m_e1, m_e2, m_normal;

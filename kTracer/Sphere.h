@@ -4,12 +4,13 @@ class Sphere :
 	public Surface
 {
 public:
-	Sphere(const Vector4d& position, double radius, Material* material)
+	Sphere(const Vector4d& position, double radius, Material* material, AreaLight* alight)
 		: m_position(position)
 		, m_radius(radius)
 		, m_radius_2(radius * radius)
 	{
 		m_material = material;
+		m_light = alight;
 		m_type = Surface::SPHERE;
 		Vector4d r(radius, radius, radius, 0);
 		m_boundingBox = AlignedBox(position - r, position + r);

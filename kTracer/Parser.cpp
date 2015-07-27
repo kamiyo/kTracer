@@ -173,7 +173,7 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec,
 			int lightNum = -1;
 			if (matName == "light") {
 				lightNum = s["light"].as<int>();
-				if (lightVec[lightNum]->type == Light::AREA) {
+				if (lightVec[lightNum]->type() == Light::AREA) {
 					alight = (AreaLight*) lightVec[lightNum];
 				}
 				else {
@@ -201,7 +201,7 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec,
 				YAML::Node p = s["position"];
 				Vector4d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1);
 				double radius = s["radius"].as<double>();
-				objVec->push_back(new Sphere(position, radius, material));
+				objVec->push_back(new Sphere(position, radius, material, alight));
 				if (alight) ((AreaLight*) lightVec[lightNum])->setSurface(objVec->back());
 				continue;
 			}
@@ -213,9 +213,17 @@ Group* Parser::loadScene(const std::unordered_map<std::string, Material*>& mVec,
 				Vector4d vert1(v1["x"].as<double>(), v1["y"].as<double>(), v1["z"].as<double>(), 1)
 					, vert2(v2["x"].as<double>(), v2["y"].as<double>(), v2["z"].as<double>(), 1)
 					, vert3(v3["x"].as<double>(), v3["y"].as<double>(), v3["z"].as<double>(), 1);
-				objVec->push_back(new Triangle(vert1, vert2, vert3, material));
+				objVec->push_back(new Triangle(vert1, vert2, vert3, material, alight));
 				if (alight) ((AreaLight*) lightVec[lightNum])->setSurface(objVec->back());
 				continue;
+			}
+			if (type == "circle") {
+				YAML::Node p = s["position"], n = s["normal"];
+				Vector4d position(p["x"].as<double>(), p["y"].as<double>(), p["z"].as<double>(), 1)
+					   , normal(n["x"].as<double>(), n["y"].as<double>(), n["z"].as<double>(), 0);
+				double radius = s["radius"].as<double>();
+				objVec->push_back(new Circle(position, normal, radius, material, alight));
+				if (alight) ((AreaLight*) lightVec[lightNum])->setSurface(objVec->back());
 			}
 		}
 		Group* masterVec = new Group();

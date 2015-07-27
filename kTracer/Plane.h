@@ -10,6 +10,7 @@ public:
 	, m_NP(-m_normal.dot(m_position))
 	{
 		m_material = material;
+		m_light = nullptr;
 		m_normal.normalize();
 		m_type = Surface::PLANE;
 		m_boundingBox = AlignedBox::Infinite();

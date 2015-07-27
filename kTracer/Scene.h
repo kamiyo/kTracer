@@ -15,7 +15,7 @@ public:
 		m_camera = p.loadCamera();
 		p.loadMaterials(m_materials);
 		p.loadLights(m_lights);
-		m_objects = p.loadScene(m_materials);
+		m_objects = p.loadScene(m_materials, m_lights);
 		m_width = m_camera->m_pixel_dim.x();
 		m_height = m_camera->m_pixel_dim.y();
 		m_rng = new Random();

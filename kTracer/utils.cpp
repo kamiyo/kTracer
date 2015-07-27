@@ -56,3 +56,41 @@ void to_unit_disk(double seedx, double seedy, Vector2d& v)
 	}
 	v << r * cos(phi), r * sin(phi);
 }
+
+Vector2d to_unit_disk(const Vector2d& uv)
+{
+	double phi, r;
+	double a = 2 * uv.x() - 1;   /* (a,b) is now on [-1,1]^2 */
+	double b = 2 * uv.y() - 1;
+
+	if (a > -b) {
+		/* region 1 or 2 */
+		if (a > b) {
+			/* region 1, also |a| > |b| */
+			r = a;
+			phi = (M_PI / 4) * (b / a);
+		}
+		else       {
+			/* region 2, also |b| > |a| */
+			r = b;
+			phi = (M_PI / 4) * (2 - (a / b));
+		}
+	}
+	else {
+		/* region 3 or 4 */
+		if (a < b) {
+			/* region 3, also |a| >= |b|, a != 0 */
+			r = -a;
+			phi = (M_PI / 4) * (4 + (b / a));
+		}
+		else       {
+			/* region 4, |b| >= |a|, but a==0 and b==0 could occur. */
+			r = -b;
+			if (b != 0)
+				phi = (M_PI / 4) * (6 - (a / b));
+			else
+				phi = 0;
+		}
+	}
+	return Vector2d(r * cos(phi), r * sin(phi));
+}
