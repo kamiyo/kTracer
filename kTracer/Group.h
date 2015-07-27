@@ -18,6 +18,8 @@ public:
 		return m_objects.back();
 	}
 
+	virtual Vector4d getNormal(const Vector4d& point) const { return nINF4DDIR; }
+
 	std::vector<Surface *> m_objects;
 };
 

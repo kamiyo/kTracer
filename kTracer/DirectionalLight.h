@@ -17,7 +17,7 @@ public:
 		return 1.0;
 	}
 
-	Vector4d getVector(const Vector4d& point) const { return -m_direction; }
+	Vector4d getVector(const Vector4d& point, const Vector2d& uv) const { return -m_direction; }
 
 
 private:

@@ -30,7 +30,7 @@ public:
 	}
 
 	void render(MatrixRgba& output);
-	void trace(Ray& ray, double t0, double t1, Rgba& out) const;
+	void trace(Ray& ray, double t0, double t1, const Vector2d& uv, Rgba& out) const;
 
 	int m_width, m_height;
 private:

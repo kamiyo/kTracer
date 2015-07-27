@@ -19,6 +19,7 @@ public:
 	~Plane() {}
 
 	bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const;
+	virtual Vector4d getNormal(const Vector4d& point) const { return m_normal; }
 
 private:
 	Vector4d m_position, m_normal;

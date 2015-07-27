@@ -7,6 +7,7 @@ public:
 	Triangle(const Vector4d& p1, const Vector4d& p2, const Vector4d& p3, Material* m, AreaLight* l);
 	
 	~Triangle() {}
+	virtual Vector4d getNormal(const Vector4d& point) const { return m_normal; }
 
 	bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const;
 	

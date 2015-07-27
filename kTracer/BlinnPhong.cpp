@@ -14,5 +14,5 @@ Rgba BlinnPhong::brdf(const Vector4d& view, const Vector4d& light, const Vector4
 	double ndotl = normal.dot(light);
 	double ndoth = normal.dot((light + view).normalized());
 	if (ndotv < 0) { ndotv = -ndotv; ndotl = -ndotl; ndoth = -ndoth; }
-	return m_diffuse * intensity * std::max(0.0, ndotl) + m_specular * std::pow(ndoth, m_power);	// ndoth is always >= 0 (half vector max is perpendicular)
+	return intensity * (m_diffuse * std::max(0.0, ndotl) + m_specular * std::pow(ndoth, m_power));	// ndoth is always >= 0 (half vector max is perpendicular)
 }

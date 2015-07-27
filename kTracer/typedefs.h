@@ -45,6 +45,9 @@ typedef Eigen::Affine3d Transform3d;
 typedef Eigen::AffineCompact2d Transform2d;
 
 template <typename Object>
+using Ref = Eigen::Ref<Object>;
+
+template <typename Object>
 using u_ptr = std::unique_ptr<Object>;
 
 template <typename Object>

@@ -24,14 +24,15 @@ int main(int argc, char** argv) {
 	else {
 		std::cerr << "Wrong number of arguments! usage:\nkTracer scene.yaml (out.exr)" << std::endl;
 		Random* rn = new Random();
-		Sampler* s = new LowDiscrepancySampler(rn);
-		Sampler2d smp(16, 16);
-		s->genPoints(smp);
-		for (int i = 0; i < (int) smp.size(); i++) {
-			Vector2d out;
-			to_unit_disk(smp(i).x(), smp(i).y(), out);
-			std::cout << out.transpose() << std::endl;
-			//std::cout << smp(i).transpose() << std::endl;
+		Circle* c = new Circle(Vector4d(rn->real(), rn->real(), rn->real(), 1),
+			Vector4d(rn->real(), rn->real(), rn->real(), 0), rn->real(), nullptr, nullptr);
+		PermutedHaltonSampler* p = new PermutedHaltonSampler(2, rn);
+		Sampler1d points(2, 1);
+		c->createUV();
+		for (int i = 0; i < 256; i++) {
+			p->genDimPoints(points, i);
+			Vector4d result = c->sample(Vector2d(points(0), points(1)));
+			std::cout << result.transpose().head(3) << std::endl;
 		}
 		return 0;
 	}

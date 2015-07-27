@@ -24,6 +24,7 @@ public:
 	virtual bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const = 0;
 	virtual double area() const { return 0; }
 	virtual Vector4d sample(const Vector2d& uv) const { return nINF4DPOINT; }
+	virtual Vector4d getNormal(const Vector4d& point) const = 0;
 	virtual double pdf() const { return 1.0 / area(); }
 	virtual double pdf(RayBase& ray) const;
 

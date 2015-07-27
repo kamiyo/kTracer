@@ -11,9 +11,9 @@ class Sampler
 {
 public:
 	//virtual void genPoints() = 0;
-	virtual void genPoints(Sampler1d& samples) = 0;
-	virtual void genPoints(Sampler1d& samples, int size, int offset = 0) = 0;
-	virtual void genPoints(Sampler2d& samples) = 0;
+	virtual void genPoints(Ref<Sampler1d>& samples) = 0;
+	virtual void genPoints(Ref<Sampler1d>& samples, int size, int offset = 0) = 0;
+	virtual void genPoints(Ref<Sampler2d>& samples) = 0;
 	virtual void genPoints(Sampler2d& samples, int size, int offset = 0) = 0;
 
 	void getIntegratorSamples(const ArrayXi& oneD, const ArrayXi& twoD, Sampler1d& oneOut, Sampler2d& twoOut) {
@@ -280,7 +280,7 @@ public:
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
 		}
-		shuffle(samples, m_rng);
+		shuffle(samples.block(offset, 0, size, 1), m_rng);
 	}
 
 	void genPoints(Sampler2d& samples) {

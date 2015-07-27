@@ -19,6 +19,9 @@ public:
 	~Sphere() {}
 
 	double area() const { return 4.0 * M_PI * m_radius_2; }
+	virtual Vector4d getNormal(const Vector4d& point) const {
+		return (point - m_position).normalized();
+	}
 
 	bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const;
 private:

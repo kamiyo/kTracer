@@ -20,12 +20,12 @@ public:
 	~PointLight() {}
 	Rgba i() const { return m_intensity; }
 
-	double getFalloff(const Vector4d& point) const {
-		double norm = (point - m_position).norm();
+	double getFalloff(const Vector4d& vector) const {
+		double norm = (vector).norm();
 		return 1 / m_attenuation.dot(Vector4d(1.0, norm, norm * norm, 0));
 	}
 
-	Vector4d getVector(const Vector4d& point) const { return (m_surface) ? (m_surface->sample() - point) : (m_position - point);	}
+	Vector4d getVector(const Vector4d& point, Vector2d& uv) const { return (m_surface) ? (m_surface->sample(uv) - point) : (m_position - point);	}
 
 private:
 	Vector4d m_position;

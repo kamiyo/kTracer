@@ -12,10 +12,10 @@ bool Circle::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
 	if (distance2 > m_radius_2) { return false; }
 
 	record.t = t;
+	record.surface = this;
 	if (ray.type() == RayBase::SHADOW) { return true; }
 
 	record.normal = m_normal;
-	record.surface = this;
 
 	return true;
 }

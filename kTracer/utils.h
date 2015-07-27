@@ -12,3 +12,4 @@ Vector4d sampleSphere(double u, double v);
 double spherePdf();
 
 void to_unit_disk(double seedx, double seedy, Vector2d& v);
+Vector2d to_unit_disk(const Vector2d& uv);

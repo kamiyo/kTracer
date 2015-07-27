@@ -12,9 +12,10 @@ void Scene::render(MatrixRgba& output) {
 	Vector2i pixels = m_camera->m_pixel_dim;
 	Sampler* s = m_options->getAASampler(m_rng);
 	int number_samples = m_options->m_samples;
-	Sampler2d iSamples, lSamples;
+	Sampler2d iSamples, lSamples, uvSamples;
 	iSamples.resize(number_samples, number_samples);
 	lSamples.resize(number_samples, number_samples);
+	//uvSamples.resize(number_samples, number_samples);
 	for (int h = 0; h < height; ++h) {
 		clock_t inner_start = clock();
 		int startray = Ray::count;
@@ -24,14 +25,17 @@ void Scene::render(MatrixRgba& output) {
 			
 			s->genPoints(iSamples);
 			s->genPoints(lSamples);
+			s->genPoints(uvSamples);
+			s->shuffle(uvSamples);
 			s->shuffle(lSamples);
 			Eigen::Matrix<Rgba, Eigen::Dynamic, 1> results(number_samples * number_samples);
 			Vector2d px(w, h);
 			for (int m = 0; m < number_samples * number_samples; m++) {
 				const Vector2d iSample = iSamples(m);
 				const Vector2d lSample = lSamples(m);
+				const Vector2d uvSample = uvSamples(m);
 				Ray view = m_camera->generateRay(px + iSample, lSample - Vector2d::Constant(0.5));
-				trace(view, 0.0, INF, results(m));
+				trace(view, 0.0, INF, uvSample, results(m));
 			}
 			// if (needsSuperSample)
 			Rgba result = Rgba::Zero();
@@ -42,6 +46,7 @@ void Scene::render(MatrixRgba& output) {
 			int revHeight = height - h - 1;
 			output(revHeight, w) = Imf::Rgba((float)result.x(), (float)result.y(), (float)result.z());
 		}
+#pragma omp atomic
 		progress += height;
 		clock_t inner_stop = clock();
 		double runtime = (double) (inner_stop - inner_start) / CLOCKS_PER_SEC;
@@ -59,7 +64,7 @@ void Scene::render(MatrixRgba& output) {
 	std::cout << "render time: " << master_run << std::endl;
 }
 
-void Scene::trace(Ray& ray, double t0, double t1, Rgba& out) const {
+void Scene::trace(Ray& ray, double t0, double t1, const Vector2d& uv, Rgba& out) const {
 	HitRecord record;
 	out = Rgba::Zero();
 	if (m_objects->hit(ray, t0, t1, record)) {
@@ -68,17 +73,23 @@ void Scene::trace(Ray& ray, double t0, double t1, Rgba& out) const {
 		const AreaLight* al = record.surface->m_light;
 		//std::string name = m->m_name;
 		if (al) {
-			out += al->L(record.normal, -ray.d());
+			out += al->L(xpoint, -ray.d());
 		}
-		for (Light* l : m_lights) {
-			const Vector4d light = l->getVector(xpoint);
-			const double falloff = l->getFalloff(xpoint);
-			Ray shadowRay(xpoint, light, RayBase::SHADOW);
-			HitRecord shadowRecord;
-			if (!m_objects->hit(shadowRay, shadowRay.epsilon(), 1.0, shadowRecord)
-				|| ((l->type() == Light::AREA) && ((AreaLight*)l)->m_surface == shadowRecord.surface)
-				) {
-				if (m) out += m->brdf(-ray.d().normalized(), light.normalized(), record.normal, falloff * l->i());
+		else {
+			for (Light* l : m_lights) {
+				const Vector4d light = l->getVector(xpoint, uv);
+				Ray shadowRay(xpoint, light, RayBase::SHADOW);
+				HitRecord shadowRecord;
+				if (!m_objects->hit(shadowRay, shadowRay.epsilon(), 1.0, shadowRecord)
+					|| ((l->type() == Light::AREA) && ((AreaLight*) l)->m_surface == shadowRecord.surface)
+					) {
+					const double falloff = l->getFalloff(light);
+					if (m) {
+						out += m->brdf(-ray.d().normalized(), light.normalized()
+							, record.normal
+							, falloff * l->L(xpoint + light, -light));
+					}
+				}
 			}
 		}
 	}

@@ -12,10 +12,8 @@ bool Sphere::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
 		if (t < t0 || t > t1) { return false; }
 
 		record.t = t;
-		if (ray.type() == RayBase::SHADOW) { return true; }
-
-		record.normal = (ray(t) - m_position).normalized();
 		record.surface = this;
+		record.normal = (ray(t) - m_position).normalized();
 		return true;
 	}
 
@@ -38,18 +36,14 @@ bool Sphere::hit(RayBase& ray, double t0, double t1, HitRecord& record) const {
 		
 		// + intersection
 		record.t = t;
-		if (ray.type() == RayBase::SHADOW) { return true; }
-
-		record.normal = (ray(t) - m_position).normalized();
 		record.surface = this;
+		record.normal = (ray(t) - m_position).normalized();
 		return true;
 	}
 
 	// - intersection
 	record.t = t;
-	if (ray.type() == RayBase::SHADOW) { return true; }
-
-	record.normal = (ray(t) - m_position).normalized();
 	record.surface = this;
+	record.normal = (ray(t) - m_position).normalized();
 	return true;
 }
