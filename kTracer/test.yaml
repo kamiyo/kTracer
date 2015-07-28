@@ -79,7 +79,7 @@ scene:
       position: {x: 0.0, y: 4.99, z: -4.0}
       normal:   {x: 0.0, y: -1.0, z: 0.0}
       material: light
-      radius: 0.5
+      radius: 2
       light: 0
     - type: circle #cat
       position: {x: 0.0, y: 0.0, z: -4.0}

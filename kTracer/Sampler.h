@@ -3,7 +3,7 @@
 #include "typedefs.h"
 #include "Random.h"
 
-std::ostream &operator<<(std::ostream &os, Sampler2d &s);
+std::ostream &operator<<(std::ostream &os, Samplerd &s);
 
 // TODO make -0.5 to 0.5
 
@@ -11,14 +11,13 @@ class Sampler
 {
 public:
 	//virtual void genPoints() = 0;
-	virtual void genPoints(Ref<Sampler1d>& samples) = 0;
-	virtual void genPoints(Ref<Sampler1d>& samples, int size, int offset = 0) = 0;
-	virtual void genPoints(Ref<Sampler2d>& samples) = 0;
-	virtual void genPoints(Sampler2d& samples, int size, int offset = 0) = 0;
+	virtual void genPoints1d(Samplerd& samples, int size, int offset = 0) = 0;
+	virtual void genPoints2d(Samplerd& samples, int size, int offset = 0) = 0;
 
-	void getIntegratorSamples(const ArrayXi& oneD, const ArrayXi& twoD, Sampler1d& oneOut, Sampler2d& twoOut) {
+	//fix twoD size
+	/*void getIntegratorSamples(const ArrayXi& oneD, const ArrayXi& twoD, Samplerd& oneOut, Samplerd& twoOut) {
 		int oneDsize = oneD.sum();
-		int twoDsize = (twoD * twoD).sum();
+		int twoDsize = (2 * twoD).sum();
 		oneOut.resize(oneDsize, 1);
 		twoOut.resize(twoDsize, 1);
 		int offset = 0;
@@ -39,73 +38,67 @@ public:
 		if (offset != twoDsize) {
 			std::cerr << "something went wrong with the sampling" << std::endl;
 		}
-	}
+	}*/
 
-	void shuffle(Sampler2d& samples, bool together = false) {
+	void shuffle(Ref<Samplerd> samples, int dim, bool together = false) {
 		if (together) {
 			int random;
-			for (int i = (int) samples.size() - 1; i > 0; i--) {
+			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
 				random = m_rng->discrete(0, i);
-				std::swap(samples(i), samples(random));
+				for (int d = 0; d < dim; d++) {
+					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
+				}
 			}
 			return;
 		}
 		else {
 			int randomx, randomy;
-			for (int i = (int) samples.size() - 1; i > 0; i--) {
-				randomx = m_rng->discrete(0, i);
-				randomy = m_rng->discrete(0, i);
-				std::swap(samples(i).x(), samples(randomx).x());
-				std::swap(samples(i).y(), samples(randomy).y());
+			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
+				for (int d = 0; d < dim; d++) {
+					double random = m_rng->discrete(0, i);
+					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
+				}
 			}
 			return;
 		}
 	}
 
-	template <typename T>
-	static inline void shuffle(Eigen::Array<T, -1, -1>& samples, Random* rng) {
-		int random;
-		for (int i = (int) samples.size() - 1; i > 0; i--) {
-			random = rng->discrete(0, i);
-			std::swap(samples(i), samples(random));
-		}
-		return;
-	}
-
-	static inline void shuffle(Sampler2d& samples, Random* rng, bool together = false) {
+	static inline void shuffle(Ref<Samplerd> samples, int dim, Random* rng, bool together = false) {
 		if (together) {
 			int random;
-			for (int i = (int) samples.size() - 1; i > 0; i--) {
+			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
 				random = rng->discrete(0, i);
-				std::swap(samples(i), samples(random));
+				for (int d = 0; d < dim; d++) {
+					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
+				}
 			}
 			return;
 		}
 		else {
 			int randomx, randomy;
-			for (int i = (int) samples.size() - 1; i > 0; i--) {
-				randomx = rng->discrete(0, i);
-				randomy = rng->discrete(0, i);
-				std::swap(samples(i).x(), samples(randomx).x());
-				std::swap(samples(i).y(), samples(randomy).y());
+			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
+				for (int d = 0; d < dim; d++) {
+					double random = rng->discrete(0, i);
+					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
+				}
 			}
 			return;
 		}
 	}
 
-	static inline void shuffle_correlated(Sampler2d& samples, Random* rng) {
+	// only 2d samples (dim = 2)
+	static inline void shuffle_correlated(Ref<Samplerd> samples, int size, Random* rng) {
 		int random;
-		int height = (int)samples.rows(), width = (int)samples.cols();
-		for (int j = height - 1; j > 0; j--) {
+		for (int j = size - 1; j > 0; j--) {
 			random = rng->discrete(0, j);
-			for (int i = 0; i < width; i++) {
-				std::swap(samples(j, i).x(), samples(random, i).x());
+			for (int i = 0; i < size; i++) {
+				std::swap(samples(size * j + i, 0), samples(size * random + i, 0));
 			}
 		}
-		for (int i = width - 1; i > 0; i--) {
+		for (int i = size - 1; i > 0; i--) {
 			random = rng->discrete(0, i);
-			for (int j = 0; j < height; j++) {
-				std::swap(samples(j, i).y(), samples(j, random).y());
+			for (int j = 0; j < size; j++) {
+				std::swap(samples(size * j + i, 1), samples(size * j + random, 1));
 			}
 		}
 	}
@@ -119,30 +112,18 @@ public:
 		m_rng = rng;
 	}
 
-	void genPoints(Sampler1d& samples) {
-		for (int i = 0; i < (int) samples.size(); i++) {
-			samples(i) = m_rng->real(0, 1);
-		}
-	}
-
-	void genPoints(Sampler2d& samples) {
-		for (int i = 0; i < (int) samples.size(); i++) {
-			samples(i) << m_rng->real(0, 1), m_rng->real(0, 1);
-		}
-	}
-
-	void genPoints(Sampler1d& samples, int offset, int size) {
+	void genPoints1d(Samplerd& samples, int size, int offset = 0) {
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = m_rng->real(0, 1);
 		}
 	}
 
-	void genPoints(Sampler2d& samples, int offset, int size) {
-		for (int i = 0; i < size * size; i++) {
-			samples(offset + i) << m_rng->real(0, 1), m_rng->real(0, 1);
+	void genPoints2d(Samplerd& samples, int size, int offset = 0) {
+		for (int i = 0; i < 2 * size * size; i += 2) {
+			samples(offset + i) = m_rng->real(0, 1);
+			samples(offset + i + 1) = m_rng->real(0, 1);
 		}
 	}
-
 };
 
 class CenteredSampler : public Sampler {
@@ -302,7 +283,7 @@ public:
 														, (j + (i + m_rng->real(0, 1)) / (double) width) / (double) height;
 			}
 		}
-		shuffle_correlated(samples, m_rng);
+		shuffle_correlated(samples.block(offset, 0, size, 1), m_rng);
 	}
 
 };
@@ -469,7 +450,7 @@ public:
 		for (unsigned int i = 0; i < (unsigned int) size; i++) {
 			Sample02(i, scramble, samples(offset + i));
 		}
-		shuffle(samples, m_rng, true);
+		shuffle(samples.block(offset, 0, size, 1), m_rng, true);
 	}
 
 	void genPoints(Sampler1d& samples) {
@@ -485,7 +466,7 @@ public:
 		for (unsigned int i = 0; i < (unsigned int) size; i++) {
 			samples(offset + i) = VanDerCorput(i, scramble);
 		}
-		shuffle(samples, m_rng);
+		shuffle(samples.block(offset, 0, size, 1), m_rng);
 	}
 
 private:
