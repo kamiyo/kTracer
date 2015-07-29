@@ -119,9 +119,9 @@ public:
 	}
 
 	void genPoints2d(Samplerd& samples, int size, int offset = 0) {
-		for (int i = 0; i < 2 * size * size; i += 2) {
-			samples(offset + i) = m_rng->real(0, 1);
-			samples(offset + i + 1) = m_rng->real(0, 1);
+		for (int i = 0; i < size * size; i++) {
+			samples(offset + i, 0) = m_rng->real(0, 1);
+			samples(offset + i, 1) = m_rng->real(0, 1);
 		}
 	}
 };
@@ -130,6 +130,20 @@ class CenteredSampler : public Sampler {
 public:
 	CenteredSampler(Random* rng) {
 		m_rng = rng;
+	}
+
+	void genPoints1d(Samplerd& samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = (i + 0.5) / size;
+		}
+	}
+
+	void genPoints2d(Samplerd& samples, int size, int offset = 0) {
+		for (int j = 0; j < )
+		for (int i = 0; i < 2 * size * size; i += 2) {
+			samples(offset + i) = m_rng->real(0, 1);
+			samples(offset + i + 1) = m_rng->real(0, 1);
+		}
 	}
 
 	void genPoints(Sampler1d& samples) {
