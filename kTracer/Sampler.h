@@ -11,8 +11,8 @@ class Sampler
 {
 public:
 	//virtual void genPoints() = 0;
-	virtual void genPoints1d(Samplerd& samples, int size, int offset = 0) = 0;
-	virtual void genPoints2d(Samplerd& samples, int size, int offset = 0) = 0;
+	virtual void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) = 0;
+	virtual void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) = 0;
 
 	//fix twoD size
 	/*void getIntegratorSamples(const ArrayXi& oneD, const ArrayXi& twoD, Samplerd& oneOut, Samplerd& twoOut) {
@@ -40,53 +40,29 @@ public:
 		}
 	}*/
 
-	void shuffle(Ref<Samplerd> samples, int dim, bool together = false) {
+	static inline void shuffle(Ref<Samplerd> samples, Random* rng, bool together = false) {
 		if (together) {
 			int random;
-			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
-				random = m_rng->discrete(0, i);
-				for (int d = 0; d < dim; d++) {
-					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
-				}
-			}
-			return;
-		}
-		else {
-			int randomx, randomy;
-			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
-				for (int d = 0; d < dim; d++) {
-					double random = m_rng->discrete(0, i);
-					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
-				}
-			}
-			return;
-		}
-	}
-
-	static inline void shuffle(Ref<Samplerd> samples, int dim, Random* rng, bool together = false) {
-		if (together) {
-			int random;
-			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
+			for (int i = (int) samples.rows(); i > 0; i--) {
 				random = rng->discrete(0, i);
-				for (int d = 0; d < dim; d++) {
-					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
-				}
+				std::swap(samples.row(i), samples.row(random));
 			}
 			return;
 		}
 		else {
-			int randomx, randomy;
-			for (int i = (int) samples.size() / dim - 1; i > 0; i--) {
+			int dim = (int) samples.cols();
+			int random;
+			for (int i = (int) samples.rows(); i > 0; i--) {
 				for (int d = 0; d < dim; d++) {
-					double random = rng->discrete(0, i);
-					std::swap(samples(dim * i + d, 0), samples(dim * random + d, 0));
+					random = rng->discrete(0, i);
+					std::swap(samples(i, d), samples(random, d));
 				}
 			}
 			return;
 		}
 	}
 
-	// only 2d samples (dim = 2)
+	// only 2d samples (dim = samples.cols() = 2), size = samples.rows() ^ 1/2
 	static inline void shuffle_correlated(Ref<Samplerd> samples, int size, Random* rng) {
 		int random;
 		for (int j = size - 1; j > 0; j--) {
@@ -112,16 +88,15 @@ public:
 		m_rng = rng;
 	}
 
-	void genPoints1d(Samplerd& samples, int size, int offset = 0) {
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = m_rng->real(0, 1);
 		}
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int offset = 0) {
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int i = 0; i < size * size; i++) {
-			samples(offset + i, 0) = m_rng->real(0, 1);
-			samples(offset + i, 1) = m_rng->real(0, 1);
+			samples.row(offset + i) << m_rng->real(0, 1), m_rng->real(0, 1);
 		}
 	}
 };
@@ -132,49 +107,21 @@ public:
 		m_rng = rng;
 	}
 
-	void genPoints1d(Samplerd& samples, int size, int offset = 0) {
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int i = 0; i < size; i++) {
-			samples(offset + i) = (i + 0.5) / size;
+			samples(offset + i) = (i + 0.5) / (double) size;
 		}
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int offset = 0) {
-		for (int j = 0; j < )
-		for (int i = 0; i < 2 * size * size; i += 2) {
-			samples(offset + i) = m_rng->real(0, 1);
-			samples(offset + i + 1) = m_rng->real(0, 1);
-		}
-	}
-
-	void genPoints(Sampler1d& samples) {
-		int size = (int)samples.size();
-		for (int i = 0; i < size; i++) {
-			samples(i) = (i + 0.5) / size;
-		}
-	}
-
-	void genPoints(Sampler2d& samples) {
-		int height = (int) samples.rows(), width = (int) samples.cols();
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				samples(j, i) << (i + 0.5) / width, (j + 0.5) / height;
-			}
-		}
-	}
-	
-	void genPoints(Sampler1d& samples, int size, int offset = 0) {
-		for (int i = 0; i < size; i++) {
-			samples(offset + i) = (i + 0.5) / size;
-		}
-	}
-
-	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int j = 0; j < size; j++) {
 			for (int i = 0; i < size; i++) {
-				samples(offset + (j * size) + i) << (i + 0.5) / size, (j + 0.5) / size;
+				samples.row(offset + j * size + i) << (i + 0.5) / (double) size
+													, (j + 0.5) / (double) size;
 			}
 		}
 	}
+
 };
 
 class StratifiedSampler : public Sampler {
@@ -183,38 +130,20 @@ public:
 		m_rng = rng;
 	}
 
-	void genPoints(Sampler1d& samples) {
-		int size = (int) samples.size();
-		for (int i = 0; i < (int) samples.size(); i++) {
-			samples(i) = (i + m_rng->real(0, 1)) / (double) size;
-		}
-	}
-
-	void genPoints(Sampler2d& samples) {
-		int height = (int) samples.rows(), width = (int) samples.cols();
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				samples(j, i) << (i + m_rng->real(0, 1)) / (double) width
-							   , (j + m_rng->real(0, 1)) / (double) height;
-			}
-		}
-	}
-
-	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
 		}
 	}
 
-	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int j = 0; j < size; j++) {
 			for (int i = 0; i < size; i++) {
-				samples(offset + (j * size) + i) << (i + m_rng->real(0, 1)) / (double) size
-												  , (j + m_rng->real(0, 1)) / (double) size;
+				samples.row(offset + j * size + i) << (i + m_rng->real(0, 1)) / (double) size
+													, (j + m_rng->real(0, 1)) / (double) size;
 			}
 		}
 	}
-
 };
 
 
@@ -224,35 +153,20 @@ public:
 		m_rng = rng;
 	}
 
-	void genPoints(Sampler1d& samples) {
-		int size = (int) samples.size();
-		for (int i = 0; i < size; i++) {
-			samples(i) = (i + m_rng->real(0, 1)) / (double) size;
-		}
-		shuffle(samples, m_rng);
-	}
-
-	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
 		}
-		shuffle(samples, m_rng);
+		shuffle(samples.block(offset, 0, size, 1), m_rng);
 	}
 
-	void genPoints(Sampler2d& samples) {
-		int size = (int) samples.size();
-		for (int i = 0; i < size; i++) {
-			samples(i) << (i + m_rng->real(0, 1)) / (double) size, (i + m_rng->real(0, 1)) / (double) size;
-		}
-		shuffle(samples, m_rng);
-	}
-
-	void genPoints(Sampler2d& samples, int size, int offset = 0) {
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
 		int total = size * size;
 		for (int i = 0; i < total; i++) {
-			samples(offset + i) << (i + m_rng->real(0, 1)) / (double) total, (i + m_rng->real(0, 1)) / (double) total;
+			samples.row(offset + i) << (i + m_rng->real(0, 1)) / (double) total
+									 , (i + m_rng->real(0, 1)) / (double) total;
 		}
-		shuffle(samples, m_rng);
+		shuffle(samples.block(offset, 0, total, 2), m_rng);
 	}
 
 };
@@ -263,41 +177,22 @@ public:
 		m_rng = rng;
 	}
 
-	void genPoints(Sampler1d& samples) {
-		int size = (int) samples.size();
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int i = 0; i < size; i++) {
-			samples(i) = (i + m_rng->real(0, 1)) / (double) size;
-		}
-		shuffle(samples, m_rng);
-	}
-
-	void genPoints(Sampler1d& samples, int size, int offset = 0) {
-		for (int i = 0; i < size; i++) {
-			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
+			samples(offset + i) = (i + m_rng->real(0, 1)) / size;
 		}
 		shuffle(samples.block(offset, 0, size, 1), m_rng);
 	}
 
-	void genPoints(Sampler2d& samples) {
-		int height = (int) samples.rows(), width = (int) samples.cols();
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				samples(j, i) << (i + (j + m_rng->real(0, 1)) / (double) height) / (double) width
-							   , (j + (i + m_rng->real(0, 1)) / (double) width) / (double) height;
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
+		for (int j = 0; j < size; j++) {
+			for (int i = 0; i < size; i++) {
+				samples.row(offset + j * size + i)
+					<< (i + (j + m_rng->real(0, 1)) / (double) size) / (double) size
+					 , (j + (i + m_rng->real(0, 1)) / (double) size) / (double) size;
 			}
 		}
-		shuffle_correlated(samples, m_rng);
-	}
-
-	void genPoints(Sampler2d& samples, int size, int offset = 0) {
-		int height = size, width = size;
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				samples(offset + (j * width) + height) << (i + (j + m_rng->real(0, 1)) / (double) height) / (double) width
-														, (j + (i + m_rng->real(0, 1)) / (double) width) / (double) height;
-			}
-		}
-		shuffle_correlated(samples.block(offset, 0, size, 1), m_rng);
+		shuffle_correlated(samples.block(offset, 0, size * size, 1), size, m_rng);
 	}
 
 };
