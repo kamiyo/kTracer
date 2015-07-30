@@ -78,8 +78,21 @@ public:
 			}
 		}
 	}
+
+	static inline double radicalInverse(int n, int base) {
+		double result = 0;
+		double invBase = 1.0 / base, invBaseIncrement = invBase;
+		while (n > 0) {
+			int digit = (n % base);
+			result += digit * invBaseIncrement;
+			n = (int) (n * invBase);
+			invBaseIncrement *= invBase;
+		}
+		return result;
+	}
 	
 	Random* m_rng;
+	int m_type;
 };
 
 class RandomSampler : public Sampler {
@@ -114,10 +127,11 @@ public:
 	}
 
 	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
+		double invSize = 1.0 / size;
 		for (int j = 0; j < size; j++) {
 			for (int i = 0; i < size; i++) {
-				samples.row(offset + j * size + i) << (i + 0.5) / (double) size
-													, (j + 0.5) / (double) size;
+				samples.row(offset + j * size + i) << (i + 0.5) * invSize
+													, (j + 0.5) * invSize;
 			}
 		}
 	}
@@ -131,16 +145,18 @@ public:
 	}
 
 	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
+		double invSize = 1.0 / size;
 		for (int i = 0; i < size; i++) {
-			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
+			samples(offset + i) = (i + m_rng->real(0, 1)) * invSize;
 		}
 	}
 
 	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
+		double invSize = 1.0 / size;
 		for (int j = 0; j < size; j++) {
 			for (int i = 0; i < size; i++) {
-				samples.row(offset + j * size + i) << (i + m_rng->real(0, 1)) / (double) size
-													, (j + m_rng->real(0, 1)) / (double) size;
+				samples.row(offset + j * size + i) << (i + m_rng->real(0, 1)) * invSize
+													, (j + m_rng->real(0, 1)) * invSize;
 			}
 		}
 	}
@@ -162,9 +178,10 @@ public:
 
 	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
 		int total = size * size;
+		double invTotal = 1.0 / total;
 		for (int i = 0; i < total; i++) {
-			samples.row(offset + i) << (i + m_rng->real(0, 1)) / (double) total
-									 , (i + m_rng->real(0, 1)) / (double) total;
+			samples.row(offset + i) << (i + m_rng->real(0, 1)) * invTotal
+									 , (i + m_rng->real(0, 1)) * invTotal;
 		}
 		shuffle(samples.block(offset, 0, total, 2), m_rng);
 	}
@@ -197,54 +214,51 @@ public:
 
 };
 
+class HammersleySampler : public Sampler {
+public:
+	HammersleySampler(Random* rng) : m_current_prime(0) {
+		m_rng = rng;
+	}
+
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
+			samples(offset + i) = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
+		}
+	}
+
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
+		int total = size * size;
+		for (int i = 0; i < total; i++) {
+			samples.row(offset + i)
+				<< radicalInverse(i, primes[(m_current_prime++) % primes.size()])
+				, i / (double) total;
+		}
+	}
+
+private:
+	static const std::vector<int> primes;
+	int m_current_prime;
+};
+
 class HaltonSampler : public Sampler {
 public:
 	HaltonSampler(Random* rng) : m_current_prime(0) {
 		m_rng = rng;
 	}
 
-	void genPoints(Sampler2d& samples) {
-		int total = (int) samples.size();
-		for (int i = 0; i < total; i++) {
-			double u = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
-			double v = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
-			samples(i) = Vector2d(u, v);
-		}
-	}
-
-	void genPoints(Sampler1d& samples) {
-		int total = (int) samples.size();
-		for (int i = 0; i < total; i++) {
-			samples(i) = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
-		}
-	}
-
-	void genPoints(Sampler2d& samples, int size, int offset = 0) {
-		int total = size * size;
-		for (int i = 0; i < total; i++) {
-			double u = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
-			double v = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
-			samples(offset + i) = Vector2d(u, v);
-		}
-	}
-
-	void genPoints(Sampler1d& samples, int size, int offset = 0) {
-		int total = size;
-		for (int i = 0; i < total; i++) {
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
+		for (int i = 0; i < size; i++) {
 			samples(offset + i) = radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
 		}
 	}
 
-	static inline double radicalInverse(int n, int base) {
-		double result = 0;
-		double invBase = 1.0 / base, invBaseIncrement = invBase;
-		while (n > 0) {
-			int digit = (n % base);
-			result += digit * invBaseIncrement;
-			n = (int) (n * invBase);
-			invBaseIncrement *= invBase;
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
+		int total = size * size;
+		for (int i = 0; i < total; i++) {
+			samples.row(offset + i)
+				<< radicalInverse(i, primes[(m_current_prime++) % primes.size()])
+				, radicalInverse(i, primes[(m_current_prime++) % primes.size()]);
 		}
-		return result;
 	}
 
 private:
