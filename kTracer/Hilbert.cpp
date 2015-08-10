@@ -8,7 +8,7 @@ Hilbert::Hilbert(int x, int y) : m_dim(Vector2i(x, y)) {
 		temp = temp << 1;
 		nOrder++;
 	}
-	m_points.resize(x, y);
+	m_points.resize(x * y, 2);
 	m_size = 0;
 	nX = nY = 0;
 	hilbert(nOrder, N, E, S, W);
@@ -28,7 +28,7 @@ void Hilbert::hilbert(int i, int front, int right, int behind, int left) {
 	if (i == 0) {
 		if (nX < m_dim.x() && nY < m_dim.y())
 		{
-			m_points(m_size++) = Vector2i(nX, nY);
+			m_points.row(m_size++) << nX, nY;
 		}
 	}
 	else {

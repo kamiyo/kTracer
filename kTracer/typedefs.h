@@ -36,6 +36,7 @@ typedef Eigen::Array4d Array4d;
 typedef Eigen::Array4i Array4i;
 typedef Eigen::Array33d Array33d;
 typedef Eigen::MatrixXd MatrixXd;
+typedef Eigen::VectorXd VectorXd;
 typedef Eigen::ArrayXi ArrayXi;
 typedef Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> Samplerd;
 typedef Eigen::Array<int, Eigen::Dynamic, Eigen::Dynamic> Sampleri;

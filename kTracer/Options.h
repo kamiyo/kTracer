@@ -12,39 +12,39 @@ public:
 	~Options() {}
 
 	void AAtype(std::string type, int n) {
-		m_antialias = enums[type];
+		m_antialias = Sampler::enums[type];
 		m_samples = n;
 	}
 	Sampler* getAASampler(Random* rng) {
-		if (m_antialias == enums["center"]) {
+		if (m_antialias == Sampler::enums["center"]) {
 			Sampler* s = new CenteredSampler(rng);
 			return s;
 		}
-		if (m_antialias == enums["jittered"]) {
+		if (m_antialias == Sampler::enums["jittered"]) {
 			Sampler* s = new StratifiedSampler(rng);
 			return s;
 		}
-		if (m_antialias == enums["random"]) {
+		if (m_antialias == Sampler::enums["random"]) {
 			Sampler* s = new RandomSampler(rng);
 			return s;
 		}
-		if (m_antialias == enums["nrooks"]) {
+		if (m_antialias == Sampler::enums["nrooks"]) {
 			Sampler* s = new NRooksSampler(rng);
 			return s;
 		}
-		if (m_antialias == enums["halton"]) {
+		if (m_antialias == Sampler::enums["halton"]) {
 			Sampler* s = new HaltonSampler(rng);
 			return s;
 		}
-		if (m_antialias == enums["permutedhalton"]) {
+		if (m_antialias == Sampler::enums["permutedhalton"]) {
 			Sampler* s = new PermutedHaltonSampler(rng);
 			return s;
 		}
-		if (m_antialias == enums["lowdiscrepancy"]) {
+		if (m_antialias == Sampler::enums["lowdiscrepancy"]) {
 			Sampler* s = new LowDiscrepancySampler(rng);
 			return s;
 		}
-		if (m_antialias == enums["multijittered"]) {
+		if (m_antialias == Sampler::enums["multijittered"]) {
 			Sampler* s = new MultiJitteredSampler(rng);
 			return s;
 		}
@@ -67,12 +67,12 @@ public:
 
 	std::map<std::string, int> enums = std::map<std::string, int>{
 		{ "off", 0 },
-		{ "center", 1 }, { "random", 2 }, { "jittered", 3 }, { "nrooks", 4 }, { "multijittered", 5 }, { "adaptive", 6 }, { "halton", 7 }, { "permutedhalton", 8 }, { "lowdiscrepancy", 9 },
 		{ "hard", 1 }, { "soft", 2 },
 		{ "square", 1 }, { "circle", 2 },
 		{ "bvh", 1 },
 		{ "scanline", 0 }, { "hilbert", 1 }
 	};
+
 	static const int OFF = 0;
 	
 	static const int CENTER = 1, RANDOM = 2, JITTERED = 3, NROOKS = 4, NROOKS_CORRELATED = 5, ADAPTIVE = 6;
