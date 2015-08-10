@@ -290,44 +290,24 @@ public:
 		shuffle(permutation, rng);
 	}
 
-	void genPoints(Sampler2d& samples) {
-		int total = (int)samples.size();
-		for (int i = 0; i < total; i++) {
-			double u = permutedRadicalInverse(i, primes[0], m_permutations[0]);
-			double v = permutedRadicalInverse(i, primes[1], m_permutations[1]);
-			samples(i) << u, v;
-		}
-	}
-
-	void genPoints(Sampler2d& samples, int size, int offset = 0) {
-		int total = size * size;
-		for (int i = 0; i < total; i++) {
-			double u = permutedRadicalInverse(i, primes[0], m_permutations[0]);
-			double v = permutedRadicalInverse(i, primes[1], m_permutations[1]);
-			samples(offset + i) << u, v;
-		}
-	}
-
-	void genPoints(Sampler1d& samples) {
-		int total = (int) samples.size();
-		for (int i = 0; i < total; i++) {
-			double u = permutedRadicalInverse(i, primes[0], m_permutations[0]);
-			samples(i) = u;
-		}
-	}
-
-	void genPoints(Sampler1d& samples, int size, int offset = 0) {
+	void genPoints1d(Ref<Samplerd> samples, int size, int offset = 0) {
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = permutedRadicalInverse(i, primes[0], m_permutations[0]);
 		}
 	}
 
-	void genDimPoints(Sampler1d& samples, int sample) {
+	void genPoints2d(Ref<Samplerd> samples, int size, int offset = 0) {
+		int total = size * size;
+		for (int i = 0; i < total; i++) {
+			samples.row(offset + i)
+				<< permutedRadicalInverse(i, primes[0], m_permutations[0])
+				, permutedRadicalInverse(i, primes[1], m_permutations[1]);
+		}
+	}
+	
+	void genDimPoints(Ref<Samplerd> samples, int sample) {
 		int total = (int) samples.size();
 		for (int i = 0; i < m_dims; i++) {
-			if (m_permutations[i].size() == 0) {
-				generatePermutation(m_permutations[i], primes[i], m_rng);
-			}
 			samples(i) = permutedRadicalInverse(sample, primes[i], m_permutations[i]);
 		}
 	}
