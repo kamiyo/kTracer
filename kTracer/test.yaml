@@ -2,7 +2,7 @@
 options:
     antialias:
         type: lowdiscrepancy
-        n: 16
+        n: 4
     shadows:
         type: soft
         shape: circle

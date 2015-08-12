@@ -1,11 +1,12 @@
 #include "Sampler.h"
 
-std::map<std::string, int> enums = std::map<std::string, int>{
+std::map<std::string, int> Sampler::enums = std::map<std::string, int>{
 	{ "off", 0 },
 	{ "center", 1 }, { "random", 2 }, { "jittered", 3 }, { "nrooks", 4 }, { "multijittered", 5 }, { "adaptive", 6 }, { "halton", 7 }, { "permutedhalton", 8 }, { "lowdiscrepancy", 9 }
 };
 
-std::ostream &operator<<(std::ostream &os, Ref<Samplerd> s) {
+std::ostream &operator<<(std::ostream &os, const Samplerd& s) {
+	os << s.cols() << " " << s.rows() << std::endl;
 	for (int j = 0; j < s.rows(); j++) {
 		for (int i = 0; i < s.cols(); i++) {
 			os << s(j, i) << " ";

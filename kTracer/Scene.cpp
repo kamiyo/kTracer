@@ -12,10 +12,10 @@ void Scene::render(MatrixRgba& output) {
 	Vector2i pixels = m_camera->m_pixel_dim;
 	Sampler* s = m_options->getAASampler(m_rng);
 	int number_samples = m_options->m_samples;
-	Sampler2d iSamples, lSamples, uvSamples;
-	iSamples.resize(number_samples, number_samples);
-	lSamples.resize(number_samples, number_samples);
-	//uvSamples.resize(number_samples, number_samples);
+	Samplerd iSamples, lSamples, uvSamples;
+	iSamples.resize(2, number_samples * number_samples);
+	lSamples.resize(2, number_samples * number_samples);
+	uvSamples.resize(2, number_samples * number_samples);
 	for (int h = 0; h < height; ++h) {
 		clock_t inner_start = clock();
 		int startray = Ray::count;
@@ -23,17 +23,17 @@ void Scene::render(MatrixRgba& output) {
 #pragma omp parallel for schedule(dynamic) firstprivate(s, iSamples, lSamples)
 		for (int w = 0; w < width; ++w) {
 			
-			s->genPoints(iSamples);
-			s->genPoints(lSamples);
-			s->genPoints(uvSamples);
-			s->shuffle(uvSamples);
-			s->shuffle(lSamples);
+			s->genPoints2d(iSamples, number_samples, 0, 1);
+			s->genPoints2d(lSamples, number_samples, 2, 3);
+			s->genPoints2d(uvSamples, number_samples, 4, 5);
+			s->shuffle(uvSamples, s->m_rng);
+			s->shuffle(lSamples, s->m_rng);
 			Eigen::Matrix<Rgba, Eigen::Dynamic, 1> results(number_samples * number_samples);
 			Vector2d px(w, h);
 			for (int m = 0; m < number_samples * number_samples; m++) {
-				const Vector2d iSample = iSamples(m);
-				const Vector2d lSample = lSamples(m);
-				const Vector2d uvSample = uvSamples(m);
+				const Vector2d iSample = iSamples.col(m);
+				const Vector2d lSample = lSamples.col(m);
+				const Vector2d uvSample = uvSamples.col(m);
 				Ray view = m_camera->generateRay(px + iSample, lSample - Vector2d::Constant(0.5));
 				trace(view, 0.0, INF, uvSample, results(m));
 			}
