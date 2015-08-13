@@ -13,7 +13,7 @@ class Sampler
 public:
 	//virtual void genPoints() = 0;
 	virtual void genPoints1d(Samplerd& samples, int size, int prime = 0, int offset = 0) = 0;
-	virtual void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) = 0;
+	virtual void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) = 0;
 
 	//fix twoD size
 	/*void getIntegratorSamples(const ArrayXi& oneD, const ArrayXi& twoD, Samplerd& oneOut, Samplerd& twoOut) {
@@ -42,42 +42,44 @@ public:
 	}*/
 
 	template <typename Derived>
-	static inline void shuffle(Eigen::ArrayBase<Derived>& samples, Random* rng, bool together = false) {
+	static inline void shuffle(Eigen::ArrayBase<Derived> const & samples, Random* rng, bool together = false) {
+		Eigen::ArrayBase<Derived> & temp = const_cast<Eigen::ArrayBase<Derived> & >(samples);
 		if (together) {
 			int random;
-			for (int i = (int) samples.cols() - 1; i > 0; i--) {
+			for (int i = (int) temp.cols() - 1; i > 0; i--) {
 				random = rng->discrete(0, i);
-				samples.col(i).swap(samples.col(random));
+				temp.col(i).swap(temp.col(random));
 			}
 			return;
 		}
 		else {
-			int dim = (int) samples.rows();
+			int dim = (int) temp.rows();
 			int random;
-			for (int i = (int) samples.cols() - 1; i > 0; i--) {
+			for (int i = (int) temp.cols() - 1; i > 0; i--) {
 				for (int d = 0; d < dim; d++) {
 					random = rng->discrete(0, i);
-					std::swap(samples(d, i), samples(d, random));
+					std::swap(temp(d, i), temp(d, random));
 				}
 			}
 			return;
 		}
 	}
-	
+
 	// only 2d samples (dim = samples.rows() = 2), size = samples.cols() ^ 1/2
 	template <typename Derived>
-	static inline void shuffle_correlated(Eigen::ArrayBase<Derived>& samples, int size, Random* rng) {
+	static inline void shuffle_correlated(Eigen::ArrayBase<Derived> const & samples, int size, Random* rng) {
+		Eigen::ArrayBase<Derived> & temp = const_cast<Eigen::ArrayBase<Derived> & >(samples);
 		int random;
 		for (int j = size - 1; j > 0; j--) {
 			random = rng->discrete(0, j);
 			for (int i = 0; i < size; i++) {
-				std::swap(samples(0, size * j + i), samples(0, size * random + i));
+				std::swap(temp(0, size * j + i), temp(0, size * random + i));
 			}
 		}
 		for (int i = size - 1; i > 0; i--) {
 			random = rng->discrete(0, i);
 			for (int j = 0; j < size; j++) {
-				std::swap(samples(1, size * j + i), samples(1, size * j + random));
+				std::swap(temp(1, size * j + i), temp(1, size * j + random));
 			}
 		}
 	}
@@ -114,7 +116,7 @@ public:
 		}
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) {
+	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
 		for (int i = 0; i < size * size; i++) {
 			samples.col(offset + i) << m_rng->real(0, 1), m_rng->real(0, 1);
 		}
@@ -160,7 +162,7 @@ public:
 		}
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) {
+	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
 		double invSize = 1.0 / size;
 		for (int j = 0; j < size; j++) {
 			for (int i = 0; i < size; i++) {
@@ -180,20 +182,21 @@ public:
 	}
 
 	void genPoints1d(Samplerd& samples, int size, int prime = 0, int offset = 0) {
+		double invSize = 1.0 / size;
 		for (int i = 0; i < size; i++) {
-			samples(offset + i) = (i + m_rng->real(0, 1)) / (double) size;
+			samples(offset + i) = (i + m_rng->real(0, 1)) * invSize;
 		}
 		shuffle(samples.block(0, offset, 1, size), m_rng);
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) {
+	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
 		int total = size * size;
 		double invTotal = 1.0 / total;
 		for (int i = 0; i < total; i++) {
 			samples.col(offset + i) << (i + m_rng->real(0, 1)) * invTotal
 									 , (i + m_rng->real(0, 1)) * invTotal;
 		}
-		shuffle(samples.block(0, offset, 2, size), m_rng);
+		shuffle(samples.block(0, offset, 2, total), m_rng);
 	}
 
 };
@@ -206,21 +209,23 @@ public:
 	}
 
 	void genPoints1d(Samplerd& samples, int size, int prime = 0, int offset = 0) {
+		double invSize = 1.0 / size;
 		for (int i = 0; i < size; i++) {
-			samples(offset + i) = (i + m_rng->real(0, 1)) / size;
+			samples(offset + i) = (i + m_rng->real(0, 1)) * invSize;
 		}
 		shuffle(samples.block(0, offset, 1, size), m_rng);
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) {
+	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
+		double invSize = 1.0 / size;
 		for (int j = 0; j < size; j++) {
 			for (int i = 0; i < size; i++) {
 				samples.col(offset + j * size + i)
-					<< (i + (j + m_rng->real(0, 1)) / (double) size) / (double) size
-					 , (j + (i + m_rng->real(0, 1)) / (double) size) / (double) size;
+					<< (i + (j + m_rng->real(0, 1)) * invSize) * invSize
+					, (j + (i + m_rng->real(0, 1)) * invSize) * invSize;
 			}
 		}
-		shuffle_correlated(samples.block(0, offset, 2, size), size, m_rng);
+		shuffle_correlated(samples.block(0, offset, 2, size * size), size, m_rng);
 	}
 
 };
@@ -242,12 +247,13 @@ public:
 		}
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) {
+	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
 		int total = size * size;
+		double invTotal = 1.0 / total;
 		for (int i = 0; i < total; i++) {
 			samples.col(offset + i)
 				<< radicalInverse(i, primes[prime0])
-				, (double) i / total;
+				,  (prime1 == 0) ? ((double) i * invTotal) : radicalInverse(i, primes[prime1]);
 		}
 	}
 
@@ -289,15 +295,16 @@ public:
 		}
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) {
+	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
 		if (m_permutations[prime0].size() == 0) {
 			generatePermutation(m_permutations[prime0], primes[prime0], m_rng);
 		}
 		int total = size * size;
+		double invTotal = 1.0 / total;
 		for (int i = 0; i < total; i++) {
 			samples.col(offset + i)
 				<< permutedRadicalInverse(i, primes[prime0], m_permutations[prime0])
-				, (double) i / total;
+				, (double) i * invTotal;
 		}
 	}
 	
@@ -351,7 +358,7 @@ public:
 		shuffle(samples.block(0, offset, 1, size), m_rng);
 	}
 
-	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 1, int offset = 0) {
+	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
 		int total = size * size;
 		Vector2ui scramble(m_rng->udiscrete(), m_rng->udiscrete());
 		for (unsigned int i = 0; i < (unsigned int) total; i++) {

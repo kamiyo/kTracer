@@ -26,12 +26,12 @@ int main(int argc, char** argv) {
 		Random* rn = new Random();
 		/*Circle* c = new Circle(Vector4d(rn->real(), rn->real(), rn->real(), 1),
 			Vector4d(rn->real(), rn->real(), rn->real(), 0), rn->real(), nullptr, nullptr);*/
-		Sampler* s = new StratifiedSampler(rn);
-		Samplerd smp(2, 4 * 4);
-		s->genPoints2d(smp, 4);
+		Sampler* s = new HaltonSampler(rn);
+		Samplerd smp(2, 8 * 8);
+		s->genPoints2d(smp, 8, 0);
 		smp.conservativeResize(3, Eigen::NoChange);
 		Sampler::shuffle(smp, rn, true);
-		smp.row(2) = VectorXd::LinSpaced(16, 0, 15).transpose();
+		smp.row(2) = VectorXd::LinSpaced(64, 0, 63).transpose();
 		std::cout << smp.transpose() << std::endl;
 		return 0;
 	}
