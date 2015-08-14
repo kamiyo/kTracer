@@ -26,11 +26,11 @@ int main(int argc, char** argv) {
 		Random* rn = new Random();
 		/*Circle* c = new Circle(Vector4d(rn->real(), rn->real(), rn->real(), 1),
 			Vector4d(rn->real(), rn->real(), rn->real(), 0), rn->real(), nullptr, nullptr);*/
-		Sampler* s = new HaltonSampler(rn);
+		Sampler* s = new PermutedHaltonSampler(rn);
 		Samplerd smp(2, 8 * 8);
-		s->genPoints2d(smp, 8, 0);
+		s->genPoints2d(smp, 8, 15, 16);
 		smp.conservativeResize(3, Eigen::NoChange);
-		Sampler::shuffle(smp, rn, true);
+		//Sampler::shuffle(smp, rn, true);
 		smp.row(2) = VectorXd::LinSpaced(64, 0, 63).transpose();
 		std::cout << smp.transpose() << std::endl;
 		return 0;

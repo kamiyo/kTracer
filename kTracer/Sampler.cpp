@@ -16,7 +16,7 @@ std::ostream &operator<<(std::ostream &os, const Samplerd& s) {
 	return os;
 }
 
-const std::vector<int> Sampler::primes =
+const std::vector<unsigned int> Sampler::primes =
 	{  2,  3,  5,  7, 11, 13, 17, 19, 23, 29
 	, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71
 	, 73, 79, 83, 89, 97,101,103,107,109,113

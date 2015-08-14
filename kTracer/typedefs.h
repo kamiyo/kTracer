@@ -38,6 +38,7 @@ typedef Eigen::Array33d Array33d;
 typedef Eigen::MatrixXd MatrixXd;
 typedef Eigen::VectorXd VectorXd;
 typedef Eigen::ArrayXi ArrayXi;
+typedef Eigen::Array<unsigned short, Eigen::Dynamic, Eigen::Dynamic> ArrayXus;
 //samplers are dimension-rows * number of sap
 typedef Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> Samplerd;
 typedef Eigen::Array<int, Eigen::Dynamic, Eigen::Dynamic> Sampleri;

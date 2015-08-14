@@ -100,7 +100,7 @@ public:
 
 	Random* m_rng;
 	int m_type;
-	static const std::vector<int> primes;
+	static const std::vector<unsigned int> primes;
 };
 
 class RandomSampler : public Sampler {
@@ -272,74 +272,90 @@ class PermutedHaltonSampler : public Sampler {
 public:
 	PermutedHaltonSampler(Random* rng) {
 		m_rng = rng;
-		for (int i = 0; i < 2; i++) {
-			generatePermutation(m_permutations[i], primes[i], m_rng);
-		}
 		m_type = enums["permutedhalton"];
 	}
 
 	PermutedHaltonSampler(int dim, Random* rng) : m_dims(dim) {
 		m_rng = rng;
-		for (int i = 0; i < m_dims; i++) {
-			generatePermutation(m_permutations[i], primes[i], m_rng);
-		}
 		m_type = enums["permutedhalton"];
 	}
 
 	void genPoints1d(Samplerd& samples, int size, int prime = 0, int offset = 0) {
-		if (m_permutations[prime].size() == 0) {
-			generatePermutation(m_permutations[prime], primes[prime], m_rng);
-		}
+		generatePermutations(prime, size);
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = permutedRadicalInverse(i, primes[prime], m_permutations[prime]);
 		}
 	}
 
 	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
-		if (m_permutations[prime0].size() == 0) {
-			generatePermutation(m_permutations[prime0], primes[prime0], m_rng);
-		}
 		int total = size * size;
+		generatePermutations(prime0, total);
+		if (prime1 != 0) generatePermutations(prime1, total);
 		double invTotal = 1.0 / total;
 		for (int i = 0; i < total; i++) {
 			samples.col(offset + i)
 				<< permutedRadicalInverse(i, primes[prime0], m_permutations[prime0])
-				, (double) i * invTotal;
+				, (prime1 == 0) ? ((double) i * invTotal) : permutedRadicalInverse(i, primes[prime1], m_permutations[prime1]);
 		}
 	}
 	
 	void genDimPoints(Samplerd& samples, int sample) {
 		int total = (int) samples.size();
 		for (int i = 0; i < m_dims; i++) {
+			generatePermutations(primes[i], (int) ceil(sample / 65535.0) * 65535);
 			samples(i) = permutedRadicalInverse(sample, primes[i], m_permutations[i]);
 		}
 	}
 
 private:
-	inline void generatePermutation(Eigen::Array<int, -1, -1>& permutation, int base, Random* rng) {
-		permutation.resize(base, 1);
-		for (int i = 0; i < base; i++) {
-			permutation(i) = i;
+	inline void generatePermutations(int prime, int size) {
+		unsigned int base = primes[prime];
+		if (m_permutations.find((unsigned short) prime) == m_permutations.end())
+		{
+			int width = (int) ceil(log(size) / log(primes[prime])) + 1;
+			ArrayXus* perm = new ArrayXus();
+			perm->resize(width, base);
+			ArrayXus linear = Eigen::Array<unsigned short, 1, -1>::LinSpaced((unsigned short) base, 0, (unsigned short)(base - 1));
+			for (int i = 0; i < (int) perm->rows(); i++) {
+				perm->row(i) = linear;
+				shuffle(perm->row(i), m_rng);
+			}
+			m_permutations[(unsigned short) prime] = perm;
+			std::cerr << *perm << std::endl;
 		}
-		shuffle(permutation, rng);
+		else {
+			int width = (int) ceil(log(size) / log(primes[prime])) + 1;
+			ArrayXus* perm = m_permutations[(unsigned short) prime];
+			if (width > (int) perm->rows()) {
+				int oldWidth = (int) perm->rows();
+				perm->conservativeResize(width, Eigen::NoChange);
+				ArrayXus linear = Eigen::Array<unsigned short, 1, -1>::LinSpaced((unsigned short) base, 0, (unsigned short) (base - 1));
+				for (int i = oldWidth; i < width; i++) {
+					perm->row(i) = linear;
+					shuffle(perm->row(i), m_rng);
+				}
+			}
+		}
 	}
 
-	inline double permutedRadicalInverse(int n, int base, Eigen::Array<int, -1, -1>& permutation) {
+	inline double permutedRadicalInverse(unsigned int n, unsigned int base, ArrayXus* permutation) {
 		double result = 0;
 		double invBase = 1.0 / base, invBaseIncrement = invBase;
+		int currentFraction = 0;
 		while (n > 0) {
-			int digit = permutation(n % base);
+			unsigned int digit = permutation->operator()(currentFraction++, n % base);
+			
 			result += digit * invBaseIncrement;
-			n = (int) (n * invBase);
+			
+			n = (unsigned int) (n * invBase);
 			invBaseIncrement *= invBase;
 		}
 		return result;
 	}
 
-	Eigen::Array<int, -1, -1> m_permutations[100];
+	std::map<unsigned short, ArrayXus* > m_permutations;
 	int m_current_prime;
 	int m_dims;
-
 
 };
 
