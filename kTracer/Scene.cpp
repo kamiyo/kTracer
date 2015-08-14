@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include <OpenEXR\half.h>
 #include <ctime>
+#include <vector>
 
 void Scene::render(MatrixRgba& output) {
 	int height = m_camera->m_pixel_dim.y(), width = m_camera->m_pixel_dim.x();
@@ -10,7 +11,10 @@ void Scene::render(MatrixRgba& output) {
 	output.resize(height, width);
 	clock_t start = clock();
 	Vector2i pixels = m_camera->m_pixel_dim;
-	Sampler* s = m_options->getAASampler(m_rng);
+	std::vector<Sampler* > sampler(omp_get_max_threads());
+	for (int i = 0; i < sampler.size(); i++) {
+		sampler[i] = m_options->getAASampler(m_rng);
+	}
 	int number_samples = m_options->m_samples;
 	Samplerd iSamples, lSamples, uvSamples;
 	iSamples.resize(2, number_samples * number_samples);
@@ -20,14 +24,17 @@ void Scene::render(MatrixRgba& output) {
 		clock_t inner_start = clock();
 		int startray = Ray::count;
 
-#pragma omp parallel for schedule(dynamic) firstprivate(s, iSamples, lSamples)
+#pragma omp parallel for schedule(dynamic) firstprivate(iSamples, lSamples, uvSamples)
 		for (int w = 0; w < width; ++w) {
-			
-			s->genPoints2d(iSamples, number_samples, 0, 1);
+			//Sampler* s = sampler[omp_get_thread_num()];
+			Sampler* s = m_options->getAASampler(m_rng);
+			s->genPoints2d(iSamples, number_samples, 4, 5);
 			s->genPoints2d(lSamples, number_samples, 2, 3);
-			s->genPoints2d(uvSamples, number_samples, 4, 5);
-			s->shuffle(uvSamples, s->m_rng);
-			s->shuffle(lSamples, s->m_rng);
+			s->genPoints2d(uvSamples, number_samples, 0, 1);
+			//s->shuffle(iSamples, s->m_rng, true);
+			s->shuffle(uvSamples, s->m_rng, true);
+			s->shuffle(lSamples, s->m_rng, true);
+
 			Eigen::Matrix<Rgba, Eigen::Dynamic, 1> results(number_samples * number_samples);
 			Vector2d px(w, h);
 			for (int m = 0; m < number_samples * number_samples; m++) {
@@ -46,8 +53,7 @@ void Scene::render(MatrixRgba& output) {
 			int revHeight = height - h - 1;
 			output(revHeight, w) = Imf::Rgba((float)result.x(), (float)result.y(), (float)result.z());
 		}
-#pragma omp atomic
-		progress += height;
+		progress += width;
 		clock_t inner_stop = clock();
 		double runtime = (double) (inner_stop - inner_start) / CLOCKS_PER_SEC;
 		double percentage = (double) progress / total;

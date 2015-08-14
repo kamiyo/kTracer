@@ -281,7 +281,7 @@ public:
 	}
 
 	void genPoints1d(Samplerd& samples, int size, int prime = 0, int offset = 0) {
-		generatePermutations(prime, size);
+		generateNewPermutation(prime, size);
 		for (int i = 0; i < size; i++) {
 			samples(offset + i) = permutedRadicalInverse(i, primes[prime], m_permutations[prime]);
 		}
@@ -289,8 +289,8 @@ public:
 
 	void genPoints2d(Samplerd& samples, int size, int prime0 = 0, int prime1 = 0, int offset = 0) {
 		int total = size * size;
-		generatePermutations(prime0, total);
-		if (prime1 != 0) generatePermutations(prime1, total);
+		generateNewPermutation(prime0, total);
+		if (prime1 != 0) generateNewPermutation(prime1, total);
 		double invTotal = 1.0 / total;
 		for (int i = 0; i < total; i++) {
 			samples.col(offset + i)
@@ -300,19 +300,19 @@ public:
 	}
 	
 	void genDimPoints(Samplerd& samples, int sample) {
-		int total = (int) samples.size();
+		int integralSize = (int) ceil((sample + 1) / 65536.0) * 65535;
 		for (int i = 0; i < m_dims; i++) {
-			generatePermutations(primes[i], (int) ceil(sample / 65535.0) * 65535);
+			generateOrExtendPermutation(i, integralSize);
 			samples(i) = permutedRadicalInverse(sample, primes[i], m_permutations[i]);
 		}
 	}
 
 private:
-	inline void generatePermutations(int prime, int size) {
+	inline void generateNewPermutation(int prime, int size) {
 		unsigned int base = primes[prime];
+		int width = (int) ceil(log(size - 1) / log(primes[prime]));
 		if (m_permutations.find((unsigned short) prime) == m_permutations.end())
 		{
-			int width = (int) ceil(log(size) / log(primes[prime])) + 1;
 			ArrayXus* perm = new ArrayXus();
 			perm->resize(width, base);
 			ArrayXus linear = Eigen::Array<unsigned short, 1, -1>::LinSpaced((unsigned short) base, 0, (unsigned short)(base - 1));
@@ -321,12 +321,38 @@ private:
 				shuffle(perm->row(i), m_rng);
 			}
 			m_permutations[(unsigned short) prime] = perm;
-			std::cerr << *perm << std::endl;
 		}
 		else {
-			int width = (int) ceil(log(size) / log(primes[prime])) + 1;
 			ArrayXus* perm = m_permutations[(unsigned short) prime];
-			if (width > (int) perm->rows()) {
+			if (width >(int) perm->rows()) {
+				int oldWidth = (int) perm->rows();
+				perm->conservativeResize(width, Eigen::NoChange);
+			}
+			ArrayXus linear = Eigen::Array<unsigned short, 1, -1>::LinSpaced((unsigned short) base, 0, (unsigned short) (base - 1));
+			for (int i = 0; i < perm->rows(); i++) {
+				perm->row(i) = linear;
+				shuffle(perm->row(i), m_rng);
+			}
+		}
+	}
+
+	inline void generateOrExtendPermutation(int prime, int size) {
+		unsigned int base = primes[prime];
+		int width = (int) ceil(log(size - 1) / log(primes[prime]));
+		if (m_permutations.find((unsigned short) prime) == m_permutations.end())
+		{
+			ArrayXus* perm = new ArrayXus();
+			perm->resize(width, base);
+			ArrayXus linear = Eigen::Array<unsigned short, 1, -1>::LinSpaced((unsigned short) base, 0, (unsigned short) (base - 1));
+			for (int i = 0; i < (int) perm->rows(); i++) {
+				perm->row(i) = linear;
+				shuffle(perm->row(i), m_rng);
+			}
+			m_permutations[(unsigned short) prime] = perm;
+		}
+		else {
+			ArrayXus* perm = m_permutations[(unsigned short) prime];
+			if (width >(int) perm->rows()) {
 				int oldWidth = (int) perm->rows();
 				perm->conservativeResize(width, Eigen::NoChange);
 				ArrayXus linear = Eigen::Array<unsigned short, 1, -1>::LinSpaced((unsigned short) base, 0, (unsigned short) (base - 1));
@@ -342,12 +368,16 @@ private:
 		double result = 0;
 		double invBase = 1.0 / base, invBaseIncrement = invBase;
 		int currentFraction = 0;
-		while (n > 0) {
+		do {
 			unsigned int digit = permutation->operator()(currentFraction++, n % base);
 			
 			result += digit * invBaseIncrement;
 			
 			n = (unsigned int) (n * invBase);
+			invBaseIncrement *= invBase;
+		} while (n > 0);
+		while (currentFraction < (int) permutation->rows()) {
+			result += invBaseIncrement * permutation->operator()(currentFraction++, 0);
 			invBaseIncrement *= invBase;
 		}
 		return result;
