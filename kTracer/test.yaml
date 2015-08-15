@@ -2,7 +2,7 @@
 options:
     antialias:
         type: permutedhalton
-        n: 5
+        n: 16
     shadows:
         type: soft
         shape: circle
@@ -50,7 +50,7 @@ materials:
 #setup lights
 lights:
     - type: area
-      intensity: {r: 10, g: 10, b: 10}
+      intensity: {r: 20, g: 20, b: 20}
       attenuation: {constant: 0.0, squared: 1.0, linear: 0.0}
 #    - type: point
 #      position: {x: 0.0, y: 4.7, z: 0.0}
@@ -76,10 +76,10 @@ scene:
       normal:   {x: 0.0, y: -1.0, z: 0.0}
       material: grey
     - type: circle #light
-      position: {x: 0.0, y: 4.99, z: -4.0}
+      position: {x: 3.0, y: 4.99, z: -1.0}
       normal:   {x: 0.0, y: -1.0, z: 0.0}
       material: light
-      radius: 2
+      radius: 1
       light: 0
     - type: circle #cat
       position: {x: 0.0, y: 0.0, z: -4.0}

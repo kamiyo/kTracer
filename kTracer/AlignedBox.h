@@ -4,7 +4,7 @@ class AlignedBox :
 	public Intersectable
 {
 public:
-	AlignedBox() { min() = INF4DPOINT, max() = nINF4DPOINT; }
+	AlignedBox() { setEmpty(); }
 	AlignedBox(const Vector4d& point) {
 		min() = max() = point;
 		m_midpoint = (min() + max()) / 2.0;
@@ -20,12 +20,25 @@ public:
 	inline Vector4d& min() { return m_box[0]; }
 	inline Vector4d& max() { return m_box[1]; }
 	inline Vector4d mid() { return m_midpoint; }
+
 	inline bool isEmpty() const { return (max().array() < min().array()).any(); }
 	inline bool isInfinite() const {
 		return (max().cwiseEqual(INF4DPOINT).all()
 			&& min().cwiseEqual(nINF4DPOINT).all());
 	}
 
+	inline void setEmpty() {
+		min() = INF4DPOINT;
+		max() = nINF4DPOINT;
+	}
+
+	inline void setInfinity() {
+		min() = nINF4DPOINT;
+		max() = INF4DPOINT;
+	}
+
+	inline Vector4d size() const { return max() - min(); }
+	inline double volume() const { return size().prod(); }
 	AlignedBox& extend(AlignedBox& other) {
 		min() = min().cwiseMin(other.min());
 		max() = max().cwiseMax(other.max());
@@ -40,8 +53,16 @@ public:
 		return *this;
 	}
 
-	inline AlignedBox merged(const AlignedBox& other) {
+	inline AlignedBox merged(const AlignedBox& other) const {
 		return AlignedBox(min().cwiseMin(other.min()), max().cwiseMax(other.max()));
+	}
+
+	inline AlignedBox intersection(const AlignedBox& other) const {
+		return AlignedBox(min().cwiseMax(other.min()), max().cwiseMin(other.max()));
+	}
+
+	inline bool intersects(const AlignedBox& other) const {
+		return intersection(other).isEmpty();
 	}
 
 	bool hit(RayBase& ray, double t0, double t1, HitRecord& record) const;
