@@ -146,6 +146,7 @@
     <ClInclude Include="Hilbert.h" />
     <ClInclude Include="HitRecord.h" />
     <ClInclude Include="Intersectable.h" />
+    <ClInclude Include="Intervals.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Material.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="Group.cpp" />
     <ClCompile Include="Hilbert.cpp" />
     <ClCompile Include="Intersectable.cpp" />
+    <ClCompile Include="Intervals.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Plane.cpp" />

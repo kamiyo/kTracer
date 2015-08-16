@@ -77,6 +77,7 @@ public:
 	}
 
 	static inline AlignedBox Infinite() { return AlignedBox(nINF4DPOINT, INF4DPOINT); }
+	static inline AlignedBox Empty() { return AlignedBox(INF4DPOINT, nINF4DPOINT); }
 
 private:
 	Vector4d m_box[2];
